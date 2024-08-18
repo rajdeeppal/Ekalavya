@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Role Audit</title>
+</head>
+<body>
+    <h1>Role Audit: <span th:text="${role.name}"></span></h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Username</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.id}"></td>
+                <td th:text="${user.username}"></td>
+                <td>
+                    <!-- Revoke Role Button -->
+                    <form th:if="${user.role != null}" th:action="@{/admin/revokeRole}" method="post">
+                        <input type="hidden" name="userId" th:value="${user.id}" />
+                        <input type="hidden" name="roleId" th:value="${role.id}" />
+                        <button type="submit">Revoke</button>
+                    </form>
+                    
+                    <!-- Reassign Role Section -->
+                    <form th:if="${user.role == null}" th:action="@{/admin/changeRole}" method="post">
+                        <input type="hidden" name="userId" th:value="${user.id}" />
+                        <label for="newRole">Select New Role:</label>
+                        <select name="newRoleId" required>
+                            <option th:each="r : ${allRoles}" th:value="${r.id}" th:text="${r.name}"></option>
+                        </select>
+                        <button type="submit">Assign Role</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+	<form th:action="@{/admin/manageRoles}" method="get">
+	    <button type="submit">Back</button>
+	</form>
+</body>
+</html>

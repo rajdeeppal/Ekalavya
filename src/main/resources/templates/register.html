@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Registration</title>
+</head>
+<body>
+    <h1>Register New User</h1>
+    <form th:action="@{/self-service/submitRoleRequest}" method="post">
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required />
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required />
+        </div>
+        <div>
+            <label for="requestedRole">Requested Role:</label>
+            <select id="requestedRole" name="requestedRole">
+                <option value="PM">PM</option>
+                <option value="DOMAIN EXPERT">DOMAIN EXPERT</option>
+                <option value="TRUSTEE">TRUSTEE</option>
+				<option value="CEO">CEO</option>
+				<option value="AO">AO</option>
+            </select>
+        </div>
+        <button type="submit">Register</button>
+    </form>
+</body>
+</html>
