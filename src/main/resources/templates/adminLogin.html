@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Login</title>
+</head>
+<body>
+<h1>Admin Login</h1>
+
+<!-- Send OTP Form -->
+<div id="sendOtpSection">
+    <form th:action="@{/admin/sendOtp}" method="post" id="sendOtpForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <button type="submit" id="sendOtpButton">Send OTP</button>
+    </form>
+</div>
+
+<!-- Input OTP Form (Initially Hidden) -->
+<div id="inputOtpSection" style="display:none;">
+    <h2>Enter OTP</h2>
+    <form th:action="@{/admin/validateOtp}" method="post" id="inputOtpForm">
+        <input type="hidden" name="username" id="otpUsername" />
+        <label for="otp">OTP:</label>
+        <input type="text" id="otp" name="otp" required>
+        <button type="submit">Login</button>
+    </form>
+
+    <div id="countdown"></div>
+    <div th:if="${error}" th:text="${error}"></div>
+</div>
+
+<script>
+    // JavaScript to handle OTP form toggling
+    document.getElementById("sendOtpForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent form submission to handle with JavaScript
+
+        // Get the username value
+        var username = document.getElementById("username").value;
+
+        // Send the OTP request via AJAX
+        fetch('/admin/sendOtp', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({username: username})
+        }).then(response => {
+            if (response.ok) {
+                // Hide the Send OTP section
+                document.getElementById("sendOtpSection").style.display = "none";
+
+                // Show the Input OTP section
+                document.getElementById("inputOtpSection").style.display = "block";
+
+                // Set the hidden username field in the OTP form
+                document.getElementById("otpUsername").value = username;
+
+                // Start the countdown timer for OTP expiration
+                startCountdown(600); // 10 minutes in seconds
+            } else {
+                // Handle error (e.g., show error message)
+                console.error("Failed to send OTP");
+            }
+        }).catch(error => console.error('Error:', error));
+    });
+
+    // Countdown timer function
+    function startCountdown(duration) {
+        var countdown = duration;
+        var countdownElement = document.getElementById('countdown');
+
+        setInterval(function() {
+            countdown--;
+            var minutes = Math.floor(countdown / 60);
+            var seconds = countdown % 60;
+            countdownElement.textContent = minutes + "m " + seconds + "s ";
+            if (countdown <= 0) {
+                countdownElement.textContent = "OTP expired!";
+            }
+        }, 1000);
+    }
+</script>
+</body>
+</html>
