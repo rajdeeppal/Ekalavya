@@ -15,9 +15,7 @@ public class RoleAuditService {
 
 	 @Autowired
 	 private RoleAuditRepository roleAuditRepository;
-	 
-	 private static final Logger logger = LoggerFactory.getLogger(RoleAuditService.class);
-	 
+
 	    public void logRoleChange(String action, User user, Role role, String performedBy) {
 	        RoleAudit audit = new RoleAudit();
 	        audit.setUser(user);
