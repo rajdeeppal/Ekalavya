@@ -74,6 +74,7 @@ public class SecurityConfig {
 //                        .requestMatchers("/admin/sendOtp").permitAll()
 //                        .requestMatchers("/admin/validateOtp").permitAll()
 //                        .requestMatchers("/admin/manageRoles").permitAll()
+                        //test
                         .requestMatchers("/admin/**").permitAll()
                         .anyRequest().authenticated()
                 )
