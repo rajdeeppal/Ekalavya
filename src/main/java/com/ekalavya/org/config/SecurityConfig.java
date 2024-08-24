@@ -71,9 +71,10 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/adminLogin").permitAll()
-                        .requestMatchers("/admin/sendOtp").permitAll()
-                        .requestMatchers("/admin/validateOtp").permitAll()
-                        .requestMatchers("/admin/**").authenticated()
+//                        .requestMatchers("/admin/sendOtp").permitAll()
+//                        .requestMatchers("/admin/validateOtp").permitAll()
+//                        .requestMatchers("/admin/manageRoles").permitAll()
+                        .requestMatchers("/admin/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

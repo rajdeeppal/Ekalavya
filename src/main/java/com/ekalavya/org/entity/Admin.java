@@ -22,4 +22,5 @@ public class Admin {
     private String email;
     private String otp;
     private LocalDateTime otpTimestamp;
+    private boolean isAlreadyValidated;
 }

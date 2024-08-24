@@ -6,8 +6,11 @@
 <body>
 <h1>Admin Login</h1>
 
+<!-- Error message -->
+<div th:if="${error}" th:text="${error}" style="color: red;"></div>
+
 <!-- Send OTP Form -->
-<div id="sendOtpSection">
+<div id="sendOtpSection" th:if="${otpSent == null}">
     <form th:action="@{/admin/sendOtp}" method="post" id="sendOtpForm">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
@@ -15,18 +18,23 @@
     </form>
 </div>
 
+<!-- OTP Sent Message -->
+<div th:if="${otpSent}" style="color: green;">
+    <p th:text="${message}"></p>
+</div>
+
 <!-- Input OTP Form (Initially Hidden) -->
-<div id="inputOtpSection" style="display:none;">
+<div id="inputOtpSection" th:if="${otpSent}">
     <h2>Enter OTP</h2>
     <form th:action="@{/admin/validateOtp}" method="post" id="inputOtpForm">
-        <input type="hidden" name="username" id="otpUsername" />
+        <input type="hidden" name="username" id="otpUsername" th:value="${username}" />
         <label for="otp">OTP:</label>
         <input type="text" id="otp" name="otp" required>
         <button type="submit">Login</button>
     </form>
 
     <div id="countdown"></div>
-    <div th:if="${error}" th:text="${error}"></div>
+    <div th:if="${error}" th:text="${error}" style="color: red;"></div>
 </div>
 
 <script>
@@ -46,19 +54,10 @@
             body: new URLSearchParams({username: username})
         }).then(response => {
             if (response.ok) {
-                // Hide the Send OTP section
-                document.getElementById("sendOtpSection").style.display = "none";
-
-                // Show the Input OTP section
-                document.getElementById("inputOtpSection").style.display = "block";
-
-                // Set the hidden username field in the OTP form
-                document.getElementById("otpUsername").value = username;
-
-                // Start the countdown timer for OTP expiration
-                startCountdown(600); // 10 minutes in seconds
+                response.text().then(html => {
+                    document.body.innerHTML = html;
+                });
             } else {
-                // Handle error (e.g., show error message)
                 console.error("Failed to send OTP");
             }
         }).catch(error => console.error('Error:', error));
