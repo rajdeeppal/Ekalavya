@@ -64,77 +64,22 @@ public class OtpService {
     }
 
     public static String getValidMaskedEmail(String email) {
-        int atIndex = email.indexOf("@");
+        int atIndex = email.indexOf('@');
+        if (atIndex == -1) {
+            return email;
+        }
         String localPart = email.substring(0, atIndex);
-        String domainPart = email.substring(atIndex);
-
-        int visibleChars = getVisibleChars(localPart.length());
-
-        if (visibleChars == 0) {
-            return "*".repeat(localPart.length()) + domainPart;
-        }
-
-        Random random = new Random();
-        char[] masked = new char[localPart.length()];
-        int range = localPart.length();
-        boolean valid = false;
-
-        while (!valid) {
-            // Mask all characters initially
-            for (int i = 0; i < masked.length; i++) {
-                masked[i] = '*';
+        String domain = email.substring(atIndex);
+        StringBuilder maskedLocalPart = new StringBuilder();
+        if (localPart.length() > 2) {
+            maskedLocalPart.append(localPart.charAt(0));
+            for (int i = 1; i < localPart.length() - 1; i++) {
+                maskedLocalPart.append('*');
             }
-
-            // Randomly select positions for visible characters
-            int[] visiblePositions = new int[visibleChars];
-            int count = 0;
-
-            while (count < visibleChars) {
-                int index = random.nextInt(range);
-                if (isValidIndex(visiblePositions, index, count)) {
-                    visiblePositions[count] = index;
-                    masked[index] = localPart.charAt(index);
-                    count++;
-                }
-            }
-
-            valid = isValidMaskedEmail(masked, visibleChars);
-        }
-
-        return new String(masked) + domainPart;
-    }
-
-    private static int getVisibleChars(int length) {
-        if (length < 4) {
-            return 0;
-        } else if (length <= 5) {
-            return 1;
-        } else if (length <= 8) {
-            return 2;
-        } else if (length <= 12) {
-            return 3;
+            maskedLocalPart.append(localPart.charAt(localPart.length() - 1));
         } else {
-            return 4;
+            maskedLocalPart.append(localPart);
         }
-    }
-
-    private static boolean isValidIndex(int[] positions, int index, int count) {
-        // Ensure there are at least 3 positions between visible characters
-        for (int i = 0; i < count; i++) {
-            if (Math.abs(positions[i] - index) < 3) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static boolean isValidMaskedEmail(char[] masked, int visibleChars) {
-        int visibleCount = 0;
-        for (char c : masked) {
-            if (c != '*') {
-                visibleCount++;
-            }
-        }
-        return visibleCount == visibleChars;
+        return maskedLocalPart + domain;
     }
 }

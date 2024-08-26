@@ -24,62 +24,6 @@ public class RoleRequest {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getRequestedRole() {
-		return requestedRole;
-	}
-
-	public void setRequestedRole(String requestedRole) {
-		this.requestedRole = requestedRole;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
-	public String getApproverComments() {
-		return approverComments;
-	}
-
-	public void setApproverComments(String approverComments) {
-		this.approverComments = approverComments;
-	}
-
-	public LocalDate getRequestDate() {
-		return requestDate;
-	}
-
-	public void setRequestDate(LocalDate requestDate) {
-		this.requestDate = requestDate;
-	}
-
-	public LocalDate getApprovalDate() {
-		return approvalDate;
-	}
-
-	public void setApprovalDate(LocalDate approvalDate) {
-		this.approvalDate = approvalDate;
-	}
-
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private User user;

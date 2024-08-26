@@ -5,49 +5,40 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 import java.util.Set;
 
 @Configuration
-@EnableWebSecurity
-public class SecurityConfig {
+@Order(2)
+public class UserSecurityConfig {
 
     @Autowired
-    @Lazy
-    private final UserDetailsService userDetailsService;
+    private UserDetailsService userDetailsService;
 
     @Autowired
-    private final PasswordEncoder passwordEncoder;
-
-    public SecurityConfig(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
-        this.userDetailsService = userDetailsService;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private PasswordEncoder passwordEncoder;
 
     @Bean
-    @Order(1)
     public SecurityFilterChain securityUserFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/pm/**").hasRole("PM")
-                        .requestMatchers("/ceo/**").hasRole("CEO")
                         .requestMatchers("/self-service/**").permitAll()
                         .requestMatchers("/register/**").permitAll()
-                        .anyRequest().permitAll()
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/pm/**").hasRole("PM")
+                        .requestMatchers("/ceo/**").hasRole("CEO")
+                        .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
@@ -60,36 +51,16 @@ public class SecurityConfig {
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
                         .permitAll()
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                )
+                .sessionManagement(session -> session
+                        .invalidSessionUrl("/login?invalid-session=true")
+                        .maximumSessions(1)
+                        .expiredUrl("/login?expired=true")
                 )
                 .csrf(csrf -> csrf.disable());
-        return http.build();
-    }
 
-    @Bean
-    @Order(2)
-    public SecurityFilterChain securityAdminFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/adminLogin").permitAll()
-//                        .requestMatchers("/admin/sendOtp").permitAll()
-//                        .requestMatchers("/admin/validateOtp").permitAll()
-//                        .requestMatchers("/admin/manageRoles").permitAll()
-                        //test
-                        .requestMatchers("/admin/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .formLogin(form -> form
-                        .loginPage("/adminLogin")
-                        .permitAll()
-                        .successHandler(adminAuthenticationSuccessHandler())
-                        .failureUrl("/adminLogin?error=true")
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/adminLogin?logout")
-                        .permitAll()
-                )
-                .csrf(csrf -> csrf.disable());
         return http.build();
     }
 
@@ -109,19 +80,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationSuccessHandler adminAuthenticationSuccessHandler() {
-        return (request, response, authentication) -> {
-            response.sendRedirect("/admin/manageRoles");
-        };
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
     }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
-    }
-
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
     }
 }
