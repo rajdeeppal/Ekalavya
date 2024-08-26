@@ -32,7 +32,7 @@ public class UserSecurityConfig {
     @Bean
     public SecurityFilterChain securityUserFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(authorize -> authorize
+/*                .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/self-service/**").permitAll()
                         .requestMatchers("/register/**").permitAll()
                         .requestMatchers("/login").permitAll()
@@ -58,9 +58,11 @@ public class UserSecurityConfig {
                         .invalidSessionUrl("/login?invalid-session=true")
                         .maximumSessions(1)
                         .expiredUrl("/login?expired=true")
+                )*/
+                .authorizeHttpRequests(authorize -> authorize
+                        .anyRequest().permitAll()
                 )
                 .csrf(csrf -> csrf.disable());
-
         return http.build();
     }
 

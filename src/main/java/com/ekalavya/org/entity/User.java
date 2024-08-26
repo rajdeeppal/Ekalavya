@@ -1,12 +1,6 @@
 package com.ekalavya.org.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,8 +19,12 @@ public class User {
 	
 	private String username;
 	private String password;
-
+	private String emailid;
+	private String domain;
 	@ManyToOne
 	@JoinColumn(name = "role_id")
 	private Role role;
+
+	@Column(unique = true)
+	private Long empId;
 }

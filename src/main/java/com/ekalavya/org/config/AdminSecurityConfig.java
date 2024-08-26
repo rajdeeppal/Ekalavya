@@ -18,7 +18,7 @@ public class AdminSecurityConfig {
     @Bean
     public SecurityFilterChain securityAdminFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(authorize -> authorize
+/*                .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/adminLogin").permitAll()
                         .requestMatchers("/admin/sendOtp").permitAll()
                         .requestMatchers("/admin/validateOtp").permitAll()
@@ -42,6 +42,9 @@ public class AdminSecurityConfig {
                         .invalidSessionUrl("/adminLogin?invalid-session=true")
                         .maximumSessions(1)
                         .expiredUrl("/adminLogin?expired=true")
+                )*/
+                .authorizeHttpRequests(authorize -> authorize
+                        .anyRequest().permitAll()
                 )
                 .csrf(csrf -> csrf.disable());
 

@@ -1,5 +1,6 @@
 package com.ekalavya.org.service;
 
+import com.ekalavya.org.entity.User;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -10,9 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
@@ -62,5 +63,27 @@ public class EmailService {
             e.printStackTrace();
             logger.info("Failed to send OTP email: " + e.getMessage());
         }
+    }
+
+    @Async
+    public void sendApprovalEmail(User user) throws MessagingException, IOException, TemplateException {
+        MimeMessage message = mailSender.createMimeMessage();
+        Map<String, Object> model = new HashMap<>();
+        model.put("userName", user.getUsername());
+        model.put("employeeId", user.getEmpId());
+        model.put("roleName", user.getRole().getName());
+        model.put("loginUrl", "http://localhost:8080/login");
+        model.put("portalName", "Ekalavya Foundation");
+        MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, "UTF-8");
+
+        Template t = freemarkerConfig.getTemplate("account-approval-email.ftl");
+        String html = FreeMarkerTemplateUtils.processTemplateIntoString(t, model);
+
+        helper.setTo(user.getEmailid());
+        helper.setText(html, true);
+        helper.setSubject("Welcome to Ekalavya – Your Account is Ready!");
+        helper.setFrom(from);
+
+        mailSender.send(message);
     }
 }

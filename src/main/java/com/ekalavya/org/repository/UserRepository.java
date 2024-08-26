@@ -19,4 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long>{
 	
 	@Query("SELECT u FROM User u JOIN RoleRequest rr ON rr.user = u WHERE u.role = :role AND rr.status = :status")
     List<User> findApprovedUsersWithSpecificRole(@Param("role") Role role, @Param("status") String status);
+
+	@Query("SELECT MAX(u.empId) FROM User u")
+	Long findMaxEmpId();
 }
