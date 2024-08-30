@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Registration</title>
+    <script>
+        function showDomainDropdown() {
+            var requestedRole = document.getElementById("requestedRole").value;
+            var domainDiv = document.getElementById("domainDiv");
+
+            if (requestedRole === "DOMAIN EXPERT") {
+                if (!domainDiv) {
+                    domainDiv = document.createElement("div");
+                    domainDiv.setAttribute("id", "domainDiv");
+
+                    var label = document.createElement("label");
+                    label.setAttribute("for", "domain");
+                    label.innerHTML = "Domain:";
+
+                    var select = document.createElement("select");
+                    select.setAttribute("id", "domain");
+                    select.setAttribute("name", "domain");
+
+                    var option1 = document.createElement("option");
+                    option1.setAttribute("value", "Watershed");
+                    option1.innerHTML = "Watershed";
+
+                    var option2 = document.createElement("option");
+                    option2.setAttribute("value", "Farming");
+                    option2.innerHTML = "Farming";
+
+                    select.appendChild(option1);
+                    select.appendChild(option2);
+
+                    domainDiv.appendChild(label);
+                    domainDiv.appendChild(select);
+
+                    var form = document.querySelector("form");
+                    form.insertBefore(domainDiv, form.querySelector("button"));
+                }
+            } else if (domainDiv) {
+                domainDiv.remove();
+            }
+        }
+    </script>
+</head>
+<body>
+<h1>Register New User</h1>
+<form th:action="@{/self-service/submitRoleRequest}" method="post">
+    <div>
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required />
+    </div>
+    <div>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required />
+    </div>
+    <div>
+        <label for="emailid">Email:</label>
+        <input type="email" id="emailid" name="emailid" required />
+    </div>
+    <div>
+        <label for="requestedRole">Requested Role:</label>
+        <select id="requestedRole" name="requestedRole" onchange="showDomainDropdown()">
+            <option value="PM">PM</option>
+            <option value="DOMAIN EXPERT">DOMAIN EXPERT</option>
+            <option value="TRUSTEE">TRUSTEE</option>
+            <option value="CEO">CEO</option>
+            <option value="AO">AO</option>
+        </select>
+    </div>
+    <!-- The Domain dropdown will be dynamically added here -->
+    <button type="submit">Register</button>
+</form>
+</body>
+</html>

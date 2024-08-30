@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Login</title>
+    <style>
+        /* Advanced CSS for a loading spinner with multiple spinning circles */
+        .spinner {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+        .spinner div {
+            box-sizing: border-box;
+            display: block;
+            position: absolute;
+            width: 64px;
+            height: 64px;
+            margin: 8px;
+            border: 8px solid #3498db;
+            border-radius: 50%;
+            animation: spinnerAnimation 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            border-color: #3498db transparent transparent transparent;
+        }
+
+        .spinner div:nth-child(1) {
+            animation-delay: -0.45s;
+        }
+        .spinner div:nth-child(2) {
+            animation-delay: -0.3s;
+        }
+        .spinner div:nth-child(3) {
+            animation-delay: -0.15s;
+        }
+
+        @keyframes spinnerAnimation {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+<h1>Admin Login</h1>
+
+<!-- Error message -->
+<div th:if="${error}" th:text="${error}" style="color: red;"></div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay">
+    <div class="spinner">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+</div>
+
+<!-- Send OTP Form -->
+<div id="sendOtpSection" th:if="${otpSent == null}">
+    <form th:action="@{/admin/sendOtp}" method="post" id="sendOtpForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <button type="submit" id="sendOtpButton">Send OTP</button>
+    </form>
+</div>
+
+<!-- OTP Sent Message -->
+<div th:if="${otpSent}" style="color: green;">
+    <p th:text="${message}"></p>
+</div>
+
+<!-- Input OTP Form (Initially Hidden) -->
+<div id="inputOtpSection" th:if="${otpSent}">
+    <h2>Enter OTP</h2>
+    <form th:action="@{/admin/validateOtp}" method="post" id="inputOtpForm">
+        <input type="hidden" name="username" id="otpUsername" th:value="${username}" />
+        <label for="otp">OTP:</label>
+        <input type="text" id="otp" name="otp" required>
+        <button type="submit">Login</button>
+    </form>
+
+    <div id="countdown"></div>
+    <div th:if="${error}" th:text="${error}" style="color: red;"></div>
+</div>
+
+<script>
+    // Handle OTP form submission
+    document.getElementById("sendOtpForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent form submission to handle with JavaScript
+
+        // Show the loading spinner
+        document.getElementById("loadingOverlay").style.display = "flex";
+
+        // Get the username value
+        var username = document.getElementById("username").value;
+
+        // Send the OTP request via AJAX
+        fetch('/admin/sendOtp', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({username: username})
+        }).then(response => {
+            // Hide the loading spinner
+            document.getElementById("loadingOverlay").style.display = "none";
+
+            if (response.ok) {
+                response.text().then(html => {
+                    document.body.innerHTML = html;
+                    // Populate the OTP input box with the username
+                    document.getElementById("otpUsername").value = username;
+                });
+            } else {
+                console.error("Failed to send OTP");
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+            document.getElementById("loadingOverlay").style.display = "none";
+        });
+    });
+
+    // Countdown timer function
+    function startCountdown(duration) {
+        var countdown = duration;
+        var countdownElement = document.getElementById('countdown');
+
+        setInterval(function() {
+            countdown--;
+            var minutes = Math.floor(countdown / 60);
+            var seconds = countdown % 60;
+            countdownElement.textContent = minutes + "m " + seconds + "s ";
+            if (countdown <= 0) {
+                countdownElement.textContent = "OTP expired!";
+            }
+        }, 1000);
+    }
+</script>
+</body>
+</html>
