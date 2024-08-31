@@ -1,11 +1,11 @@
 package com.ekalavya.org.repository;
 
-import com.ekalavya.org.entity.Admin;
+import com.ekalavya.org.entity.OtpDetails;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AdminRepository extends JpaRepository<Admin, String> {
+public interface OtpRepository extends JpaRepository<OtpDetails, String> {
 
-    Admin findByUsername(String username);
+    OtpDetails findByUsername(String username);
 }

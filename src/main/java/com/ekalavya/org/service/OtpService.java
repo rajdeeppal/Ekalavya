@@ -1,64 +1,69 @@
 package com.ekalavya.org.service;
 
-import com.ekalavya.org.entity.Admin;
-import com.ekalavya.org.repository.AdminRepository;
+import com.ekalavya.org.entity.OtpDetails;
+import com.ekalavya.org.entity.Role;
+import com.ekalavya.org.entity.User;
+import com.ekalavya.org.repository.OtpRepository;
+import com.ekalavya.org.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
 public class OtpService {
 
     @Autowired
-    private final AdminRepository adminRepository;
+    private OtpRepository otpRepository;
 
     @Autowired
-    private final EmailService emailService;
+    private EmailService emailService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(OtpService.class);
 
-    public OtpService(AdminRepository adminRepository, EmailService emailService) {
-        this.adminRepository = adminRepository;
-        this.emailService = emailService;
-    }
-
     public String generateAndSendOtp(String username) {
         String otp = String.valueOf(new Random().nextInt(999999));
-        Admin admin = adminRepository.findByUsername(username);
-        if (admin == null) {
-            return null;
-        }
-        admin.setOtp(otp);
-        admin.setOtpTimestamp(LocalDateTime.now());
-        admin.setAlreadyValidated(false);
+
+        Optional<User> user = userRepository.findByUsername(username);
+
+        OtpDetails otpDbObject = new OtpDetails();
+        otpDbObject.setUsername(username);
+        otpDbObject.setEmail(user.get().getEmailid());
+        otpDbObject.setOtp(otp);
+        otpDbObject.setOtpTimestamp(LocalDateTime.now());
+        otpDbObject.setAlreadyValidated(false);
         try {
-            adminRepository.save(admin);
-            emailService.sendOtpEmail(admin.getEmail(), otp);
+            otpRepository.save(otpDbObject);
+            emailService.sendOtpEmail(otpDbObject.getEmail(), otp);
         } catch (Exception e) {
             logger.info("Unable to send OTP!!");
             return null;
         }
-        return admin.getEmail();
+        return otpDbObject.getEmail();
     }
 
     public boolean validateOtp(String username, String otp) {
-        Admin admin = adminRepository.findByUsername(username);
-        LocalDateTime otpTimestamp = admin.getOtpTimestamp();
-        if (admin.getOtp().equals(otp) && otpTimestamp.isAfter(LocalDateTime.now().minusMinutes(10)) && !admin.isAlreadyValidated()) {
-            admin.setAlreadyValidated(true);
+        OtpDetails otpDetails = otpRepository.findByUsername(username);
+        LocalDateTime otpTimestamp = otpDetails.getOtpTimestamp();
+        if (otpDetails.getOtp().equals(otp) && otpTimestamp.isAfter(LocalDateTime.now().minusMinutes(10)) && !otpDetails.isAlreadyValidated()) {
+            otpDetails.setAlreadyValidated(true);
             return true;
         }
         return false;
     }
 
     public boolean validateAdmin(String username) {
-        Admin admin = adminRepository.findByUsername(username);
-        if (admin != null) {
-            return true;
+        Optional<User> userObject = userRepository.findByUsername(username);
+        if (userObject.isPresent()) {
+            Role userRole  = userObject.get().getRole();
+            return "SPWAdmin".equals(userRole.getName());
         }
         return false;
     }

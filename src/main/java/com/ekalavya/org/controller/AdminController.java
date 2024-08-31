@@ -3,20 +3,30 @@ package com.ekalavya.org.controller;
 import java.io.IOException;
 import java.util.List;
 
+import com.ekalavya.org.DTO.AdminLoginRequest;
 import com.ekalavya.org.DTO.ProjectConfigurationDTO;
 import com.ekalavya.org.entity.*;
 import com.ekalavya.org.service.*;
 import freemarker.template.TemplateException;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import static com.ekalavya.org.service.OtpService.getValidMaskedEmail;
+
 @Controller
+@Slf4j
 @CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/admin")
 public class AdminController {
@@ -24,10 +34,13 @@ public class AdminController {
     private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
     @Autowired
-    private RoleRequestService roleRequestService;
+    private UserService userService;
 
     @Autowired
-    private UserService userService;
+    private OtpService otpService;
+
+    @Autowired
+    private RoleRequestService roleRequestService;
 
     @Autowired
     private RoleAuditService roleAuditService;
@@ -49,6 +62,57 @@ public class AdminController {
 
     @Autowired
     private TaskService taskService;
+
+    @GetMapping("/login")
+    public String showAdminLoginPage(@ModelAttribute AdminLoginRequest adminLoginRequest, Model model) {
+        return "admin/login";
+    }
+
+    @PostMapping("/sendOtp")
+    public String sendOtp(@ModelAttribute AdminLoginRequest adminLoginRequest, Model model,
+                          HttpServletRequest request, HttpServletResponse response) {
+        log.info("inside sendotp()");
+        boolean isUserAdmin = otpService.validateAdmin(adminLoginRequest.getUsername());
+        if (isUserAdmin) {
+            String otpEmail = otpService.generateAndSendOtp(adminLoginRequest.getUsername());
+            if (otpEmail != null) {
+                String maskEmail = getValidMaskedEmail(otpEmail);
+                model.addAttribute("username", adminLoginRequest.getUsername());
+                model.addAttribute("otpSent", true);
+                model.addAttribute("message", "OTP send to: " + maskEmail);
+                return "admin/login";
+            } else {
+                model.addAttribute("error", "Failed to send OTP. Please try again.");
+                return "admin/login";
+            }
+        } else {
+            model.addAttribute("error", "Invalid Admin Credential. Please try again.");
+            return "admin/login";
+        }
+    }
+
+    @PostMapping("/validateOtp")
+    public String validateOtp(@ModelAttribute("username") String username, @ModelAttribute("otp") String otp, Model model) {
+        if (otpService.validateOtp(username, otp)) {
+            //return "redirect:/admin/manageRoles";
+            return "redirect:/admins/home";
+        } else {
+            model.addAttribute("username", username);
+            model.addAttribute("error", "Invalid OTP or OTP expired");
+            model.addAttribute("otpSent", true);
+            return "redirect:/admins/home";
+        }
+    }
+
+    @GetMapping("/logout")
+    public String showAdminLogoutPage(HttpServletRequest request, HttpServletResponse response) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if(auth != null){
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+        return "redirect:/admin/login?logout"; // Redirects to the admin login page after logout
+    }
+
 
     @GetMapping("/manageRoles")
     public String manageRoles(Model model) {

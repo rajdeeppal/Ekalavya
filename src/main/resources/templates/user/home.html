@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e9ecef;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #007bff;
+            color: #fff;
+            padding-top: 10px;
+            min-height: 70px;
+            border-bottom: #0056b3 3px solid;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 16px;
+        }
+        header ul {
+            padding: 0;
+            list-style: none;
+        }
+        header ul li {
+            float: right;
+            display: inline;
+            padding: 0 20px 0 20px;
+        }
+        header h1 {
+            float: left;
+            margin: 0;
+            padding: 0;
+        }
+        .content {
+            padding: 20px;
+            background: #fff;
+            margin-top: 20px;
+        }
+        footer {
+            background: #007bff;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1>User Dashboard</h1>
+        <ul>
+            <li><a href="/user/logout">Logout</a></li>
+        </ul>
+    </div>
+</header>
+
+<div class="container content">
+    <h2>Welcome, User!</h2>
+    <p>This is your dashboard where you can access your account details, view activities, and explore other features.</p>
+
+    <h3>Actions</h3>
+    <ul>
+        <li><a href="#">View Profile</a></li>
+        <li><a href="#">Edit Account</a></li>
+        <li><a href="#">Explore Features</a></li>
+    </ul>
+</div>
+
+<footer>
+    <p>User Dashboard &copy; 2024</p>
+</footer>
+
+</body>
+</html>

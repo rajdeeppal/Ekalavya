@@ -2,6 +2,7 @@ package com.ekalavya.org.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -10,7 +11,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Admin {
+@Table(name = "otp_details")
+public class OtpDetails {
     @Id
     private String username;
 

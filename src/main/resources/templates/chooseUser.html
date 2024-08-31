@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Selection</title>
+    <!-- Import Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Import Material UI CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        .card {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .switch-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .switch-btn {
+            width: 100%;
+            margin: 10px 0;
+            text-transform: uppercase;
+        }
+        @media (max-width: 600px) {
+            .card {
+                padding: 10px;
+            }
+            .switch-title {
+                font-size: 20px;
+            }
+            .switch-btn {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="switch-title">Select Login Type</div>
+    <a href="/admin/login" class="btn blue darken-2 switch-btn">
+        <i class="material-icons left">admin_panel_settings</i>Admin Login
+    </a>
+    <a href="/user/login" class="btn teal darken-2 switch-btn">
+        <i class="material-icons left">person</i>User Login
+    </a>
+</div>
+
+<!-- Import Materialize JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+</html>

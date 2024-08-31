@@ -3,6 +3,9 @@ package com.ekalavya.org.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,8 +20,12 @@ public class User {
 	private String password;
 	private String emailid;
 	private String domain;
-	@ManyToOne
-	@JoinColumn(name = "role_id")
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinTable(
+			name = "user_roles",
+			joinColumns = @JoinColumn(name = "user_id"),
+			inverseJoinColumns = @JoinColumn(name = "role_id")
+	)
 	private Role role;
 
 	@Column(unique = true)

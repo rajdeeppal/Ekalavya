@@ -53,8 +53,8 @@ public class EmailService {
         helper.setText(html, true);
 
         // Attach the image inline
-        ClassPathResource image = new ClassPathResource("/static/images/logo.png"); // Adjust the path as needed
-        helper.addInline("logoImage", image);
+//        ClassPathResource image = new ClassPathResource("/static/images/logo.png"); // Adjust the path as needed
+//        helper.addInline("logoImage", image);
 
         try {
             mailSender.send(message);

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Import Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Import Materialize CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        .card {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="card-content">
+        <span class="card-title center-align">User Login</span>
+        <form th:action="@{/user/login}" method="post">
+            <div class="input-field">
+                <input type="text" id="username" name="username" required>
+                <label for="username">Username</label>
+            </div>
+            <div class="input-field">
+                <input type="password" id="password" name="password" required>
+                <label for="password">Password</label>
+            </div>
+            <div class="center-align">
+                <button type="submit" class="btn blue darken-2 waves-effect waves-light">Login</button>
+            </div>
+            <div th:if="${param.error}" class="red-text center-align" style="margin-top: 10px;">
+                Invalid username or password.
+            </div>
+            <div th:if="${param.logout}" class="green-text center-align" style="margin-top: 10px;">
+                You have been logged out.
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Import Materialize JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+</body>
+</html>

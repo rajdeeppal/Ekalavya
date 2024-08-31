@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Login</title>
+    <!-- Materialize CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <!-- Materialize Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+        .login-card {
+            padding: 30px;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 100%;
+        }
+        .spinner {
+            display: inline-block;
+            position: relative;
+            width: 64px;
+            height: 64px;
+        }
+        .spinner div {
+            box-sizing: border-box;
+            display: block;
+            position: absolute;
+            width: 51px;
+            height: 51px;
+            margin: 6px;
+            border: 6px solid #3498db;
+            border-radius: 50%;
+            animation: spinnerAnimation 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            border-color: #3498db transparent transparent transparent;
+        }
+        .spinner div:nth-child(1) {
+            animation-delay: -0.45s;
+        }
+        .spinner div:nth-child(2) {
+            animation-delay: -0.3s;
+        }
+        .spinner div:nth-child(3) {
+            animation-delay: -0.15s;
+        }
+        @keyframes spinnerAnimation {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="spinner">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <!-- Admin Login Card -->
+    <div class="row">
+        <div class="col s12 m6 offset-m3">
+            <div class="card login-card">
+                <div class="card-content">
+                    <span class="card-title center-align">Admin Login</span>
+
+                    <!-- Error message -->
+                    <div th:if="${error}" class="red-text center-align" th:text="${error}"></div>
+
+                    <!-- Send OTP Form -->
+                    <div id="sendOtpSection" th:if="${otpSent == null}">
+                        <form th:action="@{/admin/sendOtp}" method="post" th:object="${adminLoginRequest}" id="sendOtpForm">
+                            <div class="input-field">
+                                <i class="material-icons prefix">account_circle</i>
+                                <input type="text" id="username" name="username" th:field="*{username}" required>
+                                <label for="username">Username</label>
+                            </div>
+                            <div class="input-field">
+                                <i class="material-icons prefix">lock</i>
+                                <input type="password" id="password" name="password" th:field="*{password}" required>
+                                <label for="password">Password</label>
+                            </div>
+                            <div class="center-align">
+                                <button type="submit" id="sendOtpButton" class="btn waves-effect waves-light">Send OTP</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- OTP Sent Message -->
+                    <div th:if="${otpSent}" class="green-text center-align">
+                        <p th:text="${message}"></p>
+                    </div>
+
+                    <!-- Input OTP Form (Initially Hidden) -->
+                    <div id="inputOtpSection" th:if="${otpSent}">
+                        <h5 class="center-align">Enter OTP</h5>
+                        <form th:action="@{/admin/validateOtp}" method="post" id="inputOtpForm">
+                            <input type="hidden" name="username" id="otpUsername" th:value="${username}" />
+                            <div class="input-field">
+                                <i class="material-icons prefix">lock</i>
+                                <input type="text" id="otp" name="otp" th:value="${otp}" required>
+                                <label for="otp">OTP</label>
+                            </div>
+                            <div class="center-align">
+                                <button type="submit" class="btn waves-effect waves-light">Validate OTP</button>
+                            </div>
+                        </form>
+
+                        <div id="countdown" class="center-align"></div>
+                        <div th:if="${error}" class="red-text center-align" th:text="${error}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Materialize JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+<script>
+    // Countdown timer function
+    function startCountdown(duration) {
+        var countdown = duration;
+        var countdownElement = document.getElementById('countdown');
+
+        setInterval(function() {
+            countdown--;
+            var minutes = Math.floor(countdown / 60);
+            var seconds = countdown % 60;
+            countdownElement.textContent = minutes + "m " + seconds + "s ";
+            if (countdown <= 0) {
+                countdownElement.textContent = "OTP expired!";
+            }
+        }, 1000);
+    }
+</script>
+
+</body>
+</html>
