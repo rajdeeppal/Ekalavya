@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Button } from 'react-bootstrap';
+import { Form, Button, Alert } from 'react-bootstrap';
 
 function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
   const [activity, setActivity] = useState({
@@ -14,24 +14,45 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
     yearOfSanction: '',
   });
 
+  const [errors, setErrors] = useState({});
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setActivity({ ...activity, [name]: value });
+    console.log(activity);
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
+  };
+
+  const validateForm = () => {
+    let formErrors = {};
+    if (!activity.nameOfWork) formErrors.nameOfWork = 'Number of Work is required';
+    if (!activity.noOfUnits) formErrors.noOfUnits = 'Number of Units is required';
+    if (!activity.totalCost) formErrors.totalCost = 'Total Cost is required';
+    if (!activity.beneficiaryContribution) formErrors.beneficiaryContribution = 'Beneficiary Contribution is required';
+    if (!activity.grantAmount) formErrors.grantAmount = 'Grant Amount is required';
+    if (!activity.yearOfSanction) formErrors.yearOfSanction = 'Year of Sanction is required';
+
+    setErrors(formErrors);
+    return Object.keys(formErrors).length === 0;
+  };
+
   const handleSave = () => {
+    if (!validateForm()) return;
+
+    console.log(activity);
     onSave(activity);
     setActivity({
-      task: '',
+      task: taskName,
       nameOfWork: '',
-      typeOfUnit: '',
-      unitRate: '',
+      typeOfUnit: typeOfUnit,
+      unitRate: unitRate,
       noOfUnits: '',
       totalCost: '',
       beneficiaryContribution: '',
       grantAmount: '',
       yearOfSanction: '',
     });
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setActivity({ ...activity, [name]: value });
+    // setErrors({});
   };
 
   return (
@@ -49,18 +70,15 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
             value={activity.nameOfWork}
             onChange={handleChange}
           />
+          {errors.nameOfWork && <Alert variant="danger">{errors.nameOfWork}</Alert>}
         </Form.Group>
         <Form.Group>
           <Form.Label>Type of Unit</Form.Label>
-          <Form.Control
-            type="text"
-            value={typeOfUnit} readOnly />
+          <Form.Control type="text" value={typeOfUnit} readOnly />
         </Form.Group>
         <Form.Group>
           <Form.Label>Unit Rate</Form.Label>
-          <Form.Control
-            type="number"
-            value={unitRate} readOnly />
+          <Form.Control type="number" value={unitRate} readOnly />
         </Form.Group>
         <Form.Group>
           <Form.Label>No of Units</Form.Label>
@@ -70,6 +88,7 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
             value={activity.noOfUnits}
             onChange={handleChange}
           />
+          {errors.noOfUnits && <Alert variant="danger">{errors.noOfUnits}</Alert>}
         </Form.Group>
         <Form.Group>
           <Form.Label>Total Cost</Form.Label>
@@ -79,6 +98,7 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
             value={activity.totalCost}
             onChange={handleChange}
           />
+          {errors.totalCost && <Alert variant="danger">{errors.totalCost}</Alert>}
         </Form.Group>
         <Form.Group>
           <Form.Label>Beneficiary Contribution</Form.Label>
@@ -88,6 +108,7 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
             value={activity.beneficiaryContribution}
             onChange={handleChange}
           />
+          {errors.beneficiaryContribution && <Alert variant="danger">{errors.beneficiaryContribution}</Alert>}
         </Form.Group>
         <Form.Group>
           <Form.Label>Grant Amount</Form.Label>
@@ -97,6 +118,7 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
             value={activity.grantAmount}
             onChange={handleChange}
           />
+          {errors.grantAmount && <Alert variant="danger">{errors.grantAmount}</Alert>}
         </Form.Group>
         <Form.Group>
           <Form.Label>Year of Sanction</Form.Label>
@@ -106,6 +128,7 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
             value={activity.yearOfSanction}
             onChange={handleChange}
           />
+          {errors.yearOfSanction && <Alert variant="danger">{errors.yearOfSanction}</Alert>}
         </Form.Group>
         <Button variant="primary" onClick={handleSave}>
           Save

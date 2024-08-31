@@ -1,118 +1,54 @@
 import React, { useState } from 'react';
-import { Table, Button, Collapse, Form } from 'react-bootstrap';
+import { Table, Button, Collapse, Form, Modal } from 'react-bootstrap';
 import Accordion from 'react-bootstrap/Accordion';
 
 const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
-  const [editMode, setEditMode] = useState({});
   const [open, setOpen] = useState({});
   const [editActivityMode, setEditActivityMode] = useState({});
-  const [newActivity, setNewActivity] = useState({});
-  const [newComponent, setNewComponent] = useState('');
-  const availableComponents = [
-    'Raw Metarial',
-    'Inbox'
-  ];
-  const [showAddComponent, setShowAddComponent] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showEdit, setShowEdit] = useState(true);
 
   const toggleCollapse = (index) => {
-    setOpen(prevState => ({ ...prevState, [index]: !prevState[index] }));
+    setOpen((prevState) => ({ ...prevState, [index]: !prevState[index] }));
   };
 
-  const handleEditClick = (index) => {
-    setEditMode(prevState => ({ ...prevState, [index]: !prevState[index] }));
-  };
-
-  const handleInputChange = (index, e) => {
-    const { name, value } = e.target;
-    const updatedBeneficiaries = [...beneficiaries];
-    updatedBeneficiaries[index][name] = value;
-    setBeneficiaries(updatedBeneficiaries);
-  };
-
-  const handleActivityInputChange = (beneficiaryIndex, componentIndex, activityIndex, e) => {
-    const { name, value } = e.target;
-    const updatedBeneficiaries = [...beneficiaries];
-    updatedBeneficiaries[beneficiaryIndex].components[componentIndex].activities[activityIndex][name] = value;
-    setBeneficiaries(updatedBeneficiaries);
-  };
-
-  const handleEditActivityClick = (beneficiaryIndex, componentIndex, activityIndex) => {
-    setEditActivityMode(prevState => ({
+  const handleEditActivityClick = (beneficiaryIndex, componentIndex, activityIndex, taskIndex) => {
+    setEditActivityMode((prevState) => ({
       ...prevState,
-      [`${beneficiaryIndex}-${componentIndex}-${activityIndex}`]: !prevState[`${beneficiaryIndex}-${componentIndex}-${activityIndex}`],
+      [`${beneficiaryIndex}-${componentIndex}-${activityIndex}-${taskIndex}`]:
+        !prevState[`${beneficiaryIndex}-${componentIndex}-${activityIndex}-${taskIndex}`],
     }));
   };
 
-  const handleSaveActivity = (beneficiaryIndex, componentIndex, activityIndex) => {
-    setEditActivityMode(prevState => ({
+  const handleActivityInputChange = (beneficiaryIndex, componentIndex, activityIndex, taskIndex, e) => {
+    const { name, value } = e.target;
+    const updatedBeneficiaries = [...beneficiaries];
+
+    const activity = updatedBeneficiaries[beneficiaryIndex]?.components[componentIndex]?.activities[activityIndex];
+    if (activity && activity.tasks && activity.tasks[taskIndex]) {
+      activity.tasks[taskIndex][name] = value;
+      setBeneficiaries(updatedBeneficiaries);
+    }
+  };
+
+  const handleSaveActivity = (beneficiaryIndex, componentIndex, activityIndex, taskIndex) => {
+    setEditActivityMode((prevState) => ({
       ...prevState,
-      [`${beneficiaryIndex}-${componentIndex}-${activityIndex}`]: false,
+      [`${beneficiaryIndex}-${componentIndex}-${activityIndex}-${taskIndex}`]: false,
     }));
-
-    // const beneficiary = beneficiaries[beneficiaryIndex];
-    // const id = beneficiary.id;
-    // const activity = beneficiary.components[componentIndex].activities[activityIndex];
-
-    // try {
-    //   const response = await axios.post(`http://localhost:8000/updated/${id}`, {
-    //     componentIndex,
-    //     activityIndex,
-    //     activity
-    //   });
-    //   console.log('Success:', response.data);
-    // } catch (error) {
-    //   console.error('Error:', error);
-    // }
   };
 
-  const handleSave = (index) => {
-    setEditMode(prevState => ({ ...prevState, [index]: false }));
-    // Optionally handle save to backend here
-    // try {
-    //   const response = await axios.post(`http://localhost:8000/updated/${id}`, beneficiary);
-    //   console.log('Success:', response.data);
-    // } catch (error) {
-    //   console.error('Error:', error);
-    // }
+  const handleSubmit = () => {
+    setShowConfirmation(true);
+    setShowEdit(false);
   };
 
-  const handleAddActivity = (beneficiaryIndex, componentIndex) => {
-    const updatedBeneficiaries = [...beneficiaries];
-    const newActivityObj = {
-      nameOfWork: '',
-      typeOfUnit: '',
-      unitRate: '',
-      noOfUnits: '',
-      totalCost: '',
-      beneficiaryContribution: '',
-      grantAmount: '',
-      yearOfSanction: '',
-    };
-    updatedBeneficiaries[beneficiaryIndex].components[componentIndex].activities.push(newActivityObj);
-    setBeneficiaries(updatedBeneficiaries);
+  const handleConfirmSubmit = () => {
+    setShowConfirmation(false);
   };
 
-  const handleAddComponent = (beneficiaryIndex) => {
-    if (!newComponent) return;
-
-    const updatedBeneficiaries = [...beneficiaries];
-    const selectedComponent = {
-      name: newComponent,
-      activities: []
-    };
-    updatedBeneficiaries[beneficiaryIndex].components.push(selectedComponent);
-    setBeneficiaries(updatedBeneficiaries);
-
-    // try {
-    //   const beneficiary = beneficiaries[beneficiaryIndex];
-    //   const response = await axios.post(`http://localhost:8000/api/beneficiaries/${beneficiary.id}/components`, selectedComponent);
-    //   console.log('Component saved:', response.data);
-    // } catch (error) {
-    //   console.error('Error saving component:', error);
-    // }
-
-    setNewComponent(''); // Clear the selected component after adding
-    setShowAddComponent(false);
+  const handleCloseConfirmation = () => {
+    setShowConfirmation(false);
   };
 
   return (
@@ -134,264 +70,212 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
           </tr>
         </thead>
         <tbody>
-          {beneficiaries.map((beneficiary, index) => (
+          {beneficiaries.map((beneficiary, beneficiaryIndex) => (
             <React.Fragment key={beneficiary.id}>
               <tr>
-                {editMode[index] ? (
-                  <>
-                    <td>
-                      <Form.Control
-                        type="text"
-                        name="beneficiaryName"
-                        value={beneficiary.beneficiaryName}
-                        onChange={(e) => handleInputChange(index, e)}
-                      />
-                    </td>
-                    <td>
-                      <Form.Control
-                        type="text"
-                        name="fatherHusbandName"
-                        value={beneficiary.fatherHusbandName}
-                        onChange={(e) => handleInputChange(index, e)}
-                      />
-                    </td>
-                    <td>
-                      <Form.Control
-                        type="text"
-                        name="village"
-                        value={beneficiary.village}
-                        onChange={(e) => handleInputChange(index, e)}
-                      />
-                    </td>
-                    <td>
-                      <Form.Control
-                        type="text"
-                        name="mandal"
-                        value={beneficiary.mandal}
-                        onChange={(e) => handleInputChange(index, e)}
-                      />
-                    </td>
-                    <td>
-                      <Form.Control
-                        type="text"
-                        name="district"
-                        value={beneficiary.district}
-                        onChange={(e) => handleInputChange(index, e)}
-                      />
-                    </td>
-                    <td>
-                      <Form.Control
-                        type="text"
-                        name="state"
-                        value={beneficiary.state}
-                        onChange={(e) => handleInputChange(index, e)}
-                      />
-                    </td>
-                    <td>
-                      <Form.Control
-                        type="text"
-                        name="aadhar"
-                        value={beneficiary.aadhar}
-                        onChange={(e) => handleInputChange(index, e)}
-                      />
-                    </td>
-                    <td>
-                      <Form.Control
-                        type="text"
-                        name="surveyNo"
-                        value={beneficiary.surveyNo}
-                        onChange={(e) => handleInputChange(index, e)}
-                      />
-                    </td>
-                    <td>
-                      <Button variant="success" onClick={() => handleSave(index)}>
-                        Save
-                      </Button>
-                    </td>
-                  </>
-                ) : (
-                  <>
-                    <td>{beneficiary.projectName}</td>
-                    <td>{beneficiary.beneficiaryName}</td>
-                    <td>{beneficiary.fatherHusbandName}</td>
-                    <td>{beneficiary.village}</td>
-                    <td>{beneficiary.mandal}</td>
-                    <td>{beneficiary.district}</td>
-                    <td>{beneficiary.state}</td>
-                    <td>{beneficiary.aadhar}</td>
-                    <td>{beneficiary.surveyNo}</td>
-                    <td>
-                      <Button
-                        variant="primary"
-                        onClick={() => toggleCollapse(index)}
-                        aria-controls={`collapse-${index}`}
-                        aria-expanded={open[index]}
-                      >
-                        View Components
-                      </Button>
-                      <Button variant="warning" onClick={() => handleEditClick(index)}>
-                        Edit
-                      </Button>
-                      
-                    </td>
-                  </>
-                )}
+                <td>{beneficiary.verticalName}</td>
+                <td>{beneficiary.beneficiaryName}</td>
+                <td>{beneficiary.fatherHusbandName}</td>
+                <td>{beneficiary.village}</td>
+                <td>{beneficiary.mandal}</td>
+                <td>{beneficiary.district}</td>
+                <td>{beneficiary.state}</td>
+                <td>{beneficiary.aadhar}</td>
+                <td>{beneficiary.surveyNo}</td>
+                <td>
+                  <Button
+                    variant="primary"
+                    onClick={() => toggleCollapse(beneficiaryIndex)}
+                    aria-controls={`collapse-${beneficiaryIndex}`}
+                    aria-expanded={open[beneficiaryIndex]}
+                  >
+                    View Components
+                  </Button>
+                </td>
               </tr>
               <tr>
                 <td colSpan="10" style={{ padding: 0 }}>
-                  <Collapse in={open[index]}>
-                    <div id={`collapse-${index}`} style={{ padding: '10px' }}>
-                    <Button onClick={() => setShowAddComponent(true)}>Add Component</Button>
-                      {showAddComponent &&
-                        <div>
-                          <Form.Control
-                            as="select"
-                            value={newComponent}
-                            onChange={(e) => setNewComponent(e.target.value)}
-                          >
-                            <option value="">Select Component</option>
-                            {availableComponents.map((component, i) => (
-                              <option key={i} value={component}>
-                                {component}
-                              </option>
-                            ))}
-                          </Form.Control>
-                          <Button onClick={() => handleAddComponent(index)}>
-                            Add
-                          </Button>
-                        </div>
-                        }
-                      {beneficiary.components.map((component, compIndex) => (
-                        <div key={compIndex}>
+                  <Collapse in={open[beneficiaryIndex]}>
+                    <div id={`collapse-${beneficiaryIndex}`} style={{ padding: '10px' }}>
+                      {beneficiary.components?.map((component, componentIndex) => (
+                        <div key={component.id}>
                           <Accordion defaultActiveKey="0">
-                            <Accordion.Item eventKey={compIndex}>
-                              <Accordion.Header>{component.name}</Accordion.Header>
+                            <Accordion.Item eventKey={component.id}>
+                              <Accordion.Header>{component.componentName}</Accordion.Header>
                               <Accordion.Body>
-                                <Button
-                                  variant="primary"
-                                  onClick={() => handleAddActivity(index, compIndex)}
-                                  style={{ marginBottom: '10px' }}
-                                >
-                                  Add Activity
-                                </Button>
-                                <Table striped bordered hover>
-                                  <thead>
-                                    <tr>
-                                      <th>Name of the Work</th>
-                                      <th>Type of Unit</th>
-                                      <th>Unit Rate</th>
-                                      <th>No. of Units</th>
-                                      <th>Total Cost</th>
-                                      <th>Beneficiary Contribution</th>
-                                      <th>Grant Amount</th>
-                                      <th>Year of Sanction</th>
-                                      <th>Actions</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {component.activities.map((activity, activityIndex) => (
-                                      <tr key={activityIndex}>
-                                        {editActivityMode[`${index}-${compIndex}-${activityIndex}`] ? (
-                                          <>
-                                            <td>
-                                              <Form.Control
-                                                type="text"
-                                                name="nameOfWork"
-                                                value={activity.nameOfWork}
-                                                onChange={(e) => handleActivityInputChange(index, compIndex, activityIndex, e)}
-                                              />
-                                            </td>
-                                            <td>
-                                              <Form.Control
-                                                type="text"
-                                                name="typeOfUnit"
-                                                value={activity.typeOfUnit}
-                                                onChange={(e) => handleActivityInputChange(index, compIndex, activityIndex, e)}
-                                              />
-                                            </td>
-                                            <td>
-                                              <Form.Control
-                                                type="text"
-                                                name="unitRate"
-                                                value={activity.unitRate}
-                                                onChange={(e) => handleActivityInputChange(index, compIndex, activityIndex, e)}
-                                              />
-                                            </td>
-                                            <td>
-                                              <Form.Control
-                                                type="text"
-                                                name="noOfUnits"
-                                                value={activity.noOfUnits}
-                                                onChange={(e) => handleActivityInputChange(index, compIndex, activityIndex, e)}
-                                              />
-                                            </td>
-                                            <td>
-                                              <Form.Control
-                                                type="text"
-                                                name="totalCost"
-                                                value={activity.totalCost}
-                                                onChange={(e) => handleActivityInputChange(index, compIndex, activityIndex, e)}
-                                              />
-                                            </td>
-                                            <td>
-                                              <Form.Control
-                                                type="text"
-                                                name="beneficiaryContribution"
-                                                value={activity.beneficiaryContribution}
-                                                onChange={(e) => handleActivityInputChange(index, compIndex, activityIndex, e)}
-                                              />
-                                            </td>
-                                            <td>
-                                              <Form.Control
-                                                type="text"
-                                                name="grantAmount"
-                                                value={activity.grantAmount}
-                                                onChange={(e) => handleActivityInputChange(index, compIndex, activityIndex, e)}
-                                              />
-                                            </td>
-                                            <td>
-                                              <Form.Control
-                                                type="text"
-                                                name="yearOfSanction"
-                                                value={activity.yearOfSanction}
-                                                onChange={(e) => handleActivityInputChange(index, compIndex, activityIndex, e)}
-                                              />
-                                            </td>
-                                            <td>
-                                              <Button variant="success" onClick={() => handleSaveActivity(index, compIndex, activityIndex)}>
-                                                Save
-                                              </Button>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>{activity.nameOfWork}</td>
-                                            <td>{activity.typeOfUnit}</td>
-                                            <td>{activity.unitRate}</td>
-                                            <td>{activity.noOfUnits}</td>
-                                            <td>{activity.totalCost}</td>
-                                            <td>{activity.beneficiaryContribution}</td>
-                                            <td>{activity.grantAmount}</td>
-                                            <td>{activity.yearOfSanction}</td>
-                                            <td>
-                                              <Button
-                                                variant="warning"
-                                                onClick={() => handleEditActivityClick(index, compIndex, activityIndex)}
-                                              >
-                                                Edit
-                                              </Button>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                </Table>
+                                {component.activities?.map((activity, activityIndex) => (
+                                  <div key={activity.id}>
+                                    <Accordion defaultActiveKey="0">
+                                      <Accordion.Item eventKey={activity.id}>
+                                        <Accordion.Header>{activity.activityName}</Accordion.Header>
+                                        <Accordion.Body>
+                                          <Table striped bordered hover>
+                                            <thead>
+                                              <tr>
+                                                <th>Name of the Work</th>
+                                                <th>Type of Unit</th>
+                                                <th>Unit Rate</th>
+                                                <th>No. of Units</th>
+                                                <th>Total Cost</th>
+                                                <th>Beneficiary Contribution</th>
+                                                <th>Grant Amount</th>
+                                                <th>Year of Sanction</th>
+                                                {showEdit &&
+                                                  <th>Actions</th>}
+                                              </tr>
+                                            </thead>
+                                            <tbody>
+                                              {activity.tasks?.map((task, taskIndex) => (
+                                                <tr key={task.id}>
+                                                  {editActivityMode[`${beneficiaryIndex}-${componentIndex}-${activityIndex}-${taskIndex}`] ? (
+                                                    <>
+                                                      <td>{task.taskName}</td>
+                                                      <td>{task.typeOfUnit}</td>
+                                                      <td>{task.ratePerUnit}</td>
+                                                      <td>
+                                                        <Form.Control
+                                                          type="text"
+                                                          name="units"
+                                                          value={task.units || ''}
+                                                          onChange={(e) =>
+                                                            handleActivityInputChange(
+                                                              beneficiaryIndex,
+                                                              componentIndex,
+                                                              activityIndex,
+                                                              taskIndex,
+                                                              e
+                                                            )
+                                                          }
+                                                        />
+                                                      </td>
+                                                      <td>
+                                                        <Form.Control
+                                                          type="text"
+                                                          name="totalCost"
+                                                          value={task.totalCost || ''}
+                                                          onChange={(e) =>
+                                                            handleActivityInputChange(
+                                                              beneficiaryIndex,
+                                                              componentIndex,
+                                                              activityIndex,
+                                                              taskIndex,
+                                                              e
+                                                            )
+                                                          }
+                                                        />
+                                                      </td>
+                                                      <td>
+                                                        <Form.Control
+                                                          type="text"
+                                                          name="beneficiaryContribution"
+                                                          value={task.beneficiaryContribution || ''}
+                                                          onChange={(e) =>
+                                                            handleActivityInputChange(
+                                                              beneficiaryIndex,
+                                                              componentIndex,
+                                                              activityIndex,
+                                                              taskIndex,
+                                                              e
+                                                            )
+                                                          }
+                                                        />
+                                                      </td>
+                                                      <td>
+                                                        <Form.Control
+                                                          type="text"
+                                                          name="grantAmount"
+                                                          value={task.grantAmount || ''}
+                                                          onChange={(e) =>
+                                                            handleActivityInputChange(
+                                                              beneficiaryIndex,
+                                                              componentIndex,
+                                                              activityIndex,
+                                                              taskIndex,
+                                                              e
+                                                            )
+                                                          }
+                                                        />
+                                                      </td>
+                                                      <td>
+                                                        <Form.Control
+                                                          type="text"
+                                                          name="yearOfSanction"
+                                                          value={task.yearOfSanction || ''}
+                                                          onChange={(e) =>
+                                                            handleActivityInputChange(
+                                                              beneficiaryIndex,
+                                                              componentIndex,
+                                                              activityIndex,
+                                                              taskIndex,
+                                                              e
+                                                            )
+                                                          }
+                                                        />
+                                                      </td>
+                                                      <td>
+                                                        <Button
+                                                          variant="success"
+                                                          onClick={() =>
+                                                            handleSaveActivity(
+                                                              beneficiaryIndex,
+                                                              componentIndex,
+                                                              activityIndex,
+                                                              taskIndex
+                                                            )
+                                                          }
+                                                        >
+                                                          Save
+                                                        </Button>
+                                                      </td>
+                                                    </>
+                                                  ) : (
+                                                    <>
+                                                      <td>{task.taskName}</td>
+                                                      <td>{task.typeOfUnit}</td>
+                                                      <td>{task.ratePerUnit}</td>
+                                                      <td>{task.units}</td>
+                                                      <td>{task.totalCost}</td>
+                                                      <td>{task.beneficiaryContribution}</td>
+                                                      <td>{task.grantAmount}</td>
+                                                      <td>{task.yearOfSanction}</td>
+                                                      {showEdit && <td>
+                                                        <Button
+                                                          variant="warning"
+                                                          onClick={() =>
+                                                            handleEditActivityClick(
+                                                              beneficiaryIndex,
+                                                              componentIndex,
+                                                              activityIndex,
+                                                              taskIndex
+                                                            )
+                                                          }
+                                                        >
+                                                          Edit
+                                                        </Button>
+                                                      </td>}
+                                                    </>
+                                                  )}
+                                                </tr>
+                                              ))}
+                                            </tbody>
+                                          </Table>
+                                        </Accordion.Body>
+                                      </Accordion.Item>
+                                    </Accordion>
+                                  </div>
+                                ))}
                               </Accordion.Body>
                             </Accordion.Item>
                           </Accordion>
                         </div>
                       ))}
+                      <Button
+                        variant="primary"
+                        onClick={() => handleSubmit(beneficiaryIndex)}
+                        style={{ marginTop: '10px' }}
+                      >
+                        Submit
+                      </Button>
                     </div>
                   </Collapse>
                 </td>
@@ -400,6 +284,20 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
           ))}
         </tbody>
       </Table>
+      <Modal show={showConfirmation} onHide={handleCloseConfirmation}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Submission</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Do you want to submit the changes?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseConfirmation}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={handleConfirmSubmit}>
+            Yes, Submit
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

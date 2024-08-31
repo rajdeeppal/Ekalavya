@@ -9,7 +9,71 @@ const MainApp = () => {
 
   
   const [projects, setProjects] = useState([]);
-  const [beneficiaries, setBeneficiaries] = useState([]);
+  const [beneficiaries, setBeneficiaries] = useState([
+    {
+        "id": 1,
+        "verticalName": "BT",
+        "components": [
+            {
+                "id": 1,
+                "componentName": "Enterprise",
+                "activities": [
+                    {
+                        "id": 1,
+                        "activityName": "AIB",
+                        "tasks": [
+                            {
+                                "id": 1,
+                                "taskName": "VOICE",
+                                "typeOfUnit":"gm",
+                                "units": "10",
+                                "ratePerUnit": "800",
+                                "totalCost":"234",
+                                "beneficiaryContribution":"12",
+                                "grantAmount":"234",
+                                "yearOfSanction":"2009"
+                            },
+                            {
+                                "id": 3,
+                                "taskName": "CV",
+                                "typeOfUnit":"gm",
+                                "units": "20",
+                                "ratePerUnit": "700",
+                                "totalCost":"234",
+                                "beneficiaryContribution":"12",
+                                "grantAmount":"234",
+                                "yearOfSanction":"2009"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": 2,
+                "componentName": "Consumer",
+                "activities": [
+                    {
+                        "id": 2,
+                        "activityName": "OFS",
+                        "tasks": [
+                            {
+                                "id": 2,
+                                "taskName": "Global",
+                                "typeOfUnit":"gm",
+                                "units": "96",
+                                "ratePerUnit": "89",
+                                "totalCost":"234",
+                                "beneficiaryContribution":"12",
+                                "grantAmount":"234",
+                                "yearOfSanction":"2009"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]);
 
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [showBeneficiaryModal, setShowBeneficiaryModal] = useState(false);
@@ -57,7 +121,7 @@ const MainApp = () => {
         </Modal.Body>
       </Modal>
 
-      <pre>{JSON.stringify({ projects, beneficiaries }, null, 2)}</pre>
+      {/* <pre>{JSON.stringify({ projects, beneficiaries }, null, 2)}</pre> */}
       <BeneficiaryTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries}/>
     </Container>
   );
