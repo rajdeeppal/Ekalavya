@@ -49,7 +49,7 @@ export const getTasks = async (activity) => {
 // Fetch tasks by its ID for editing
 export const getTaskById = async (taskId) => {
     try {
-        const response = await axios.get(`${BASE_URL}/tasks/${taskId}`);
+        const response = await axios.get(`${BASE_URL}/task/${taskId}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching task by ID:', error);
@@ -70,7 +70,7 @@ export const saveConfiguration = async (projectConfig) => {
 // Update an existing task
 export const updateTask = async (taskId, updatedTask) => {
     try {
-        await axios.put(`${BASE_URL}/tasks/${taskId}`, updatedTask, {
+        await axios.put(`${BASE_URL}/task/${taskId}`, updatedTask, {
             headers: {
                 'Content-Type': 'application/json',
             },

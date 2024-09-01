@@ -242,13 +242,13 @@ public class AdminController {
         }
     }
 
-    @PutMapping("/tasks/{taskId}")
+    @PutMapping("/task/{taskId}")
     public ResponseEntity<String> updateTask(@PathVariable Long taskId, @RequestBody TaskDTO taskDTO) {
         taskService.updateTask(taskId, taskDTO);
         return ResponseEntity.ok("Configuration update successfully.");
     }
 
-    @GetMapping("/tasks/{taskId}")
+    @GetMapping("/task/{taskId}")
     public ResponseEntity<?> getTaskById(@PathVariable Long taskId) {
         try {
             Optional<Task> task = taskService.getTaskById(taskId);
