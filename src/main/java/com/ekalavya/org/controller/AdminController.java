@@ -2,9 +2,11 @@ package com.ekalavya.org.controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import com.ekalavya.org.DTO.AdminLoginRequest;
 import com.ekalavya.org.DTO.ProjectConfigurationDTO;
+import com.ekalavya.org.DTO.TaskDTO;
 import com.ekalavya.org.entity.*;
 import com.ekalavya.org.service.*;
 import freemarker.template.TemplateException;
@@ -107,7 +109,7 @@ public class AdminController {
     @GetMapping("/logout")
     public String showAdminLogoutPage(HttpServletRequest request, HttpServletResponse response) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if(auth != null){
+        if (auth != null) {
             new SecurityContextLogoutHandler().logout(request, response, auth);
         }
         return "redirect:/admin/login?logout"; // Redirects to the admin login page after logout
@@ -126,7 +128,7 @@ public class AdminController {
         RoleRequest request = roleRequestService.approveRequest(requestId, approverComments);
         User user = request.getUser();
         Role role = roleService.getRoleByRolename(request.getRequestedRole());
-        if(role != null ) {
+        if (role != null) {
             emailService.sendApprovalEmail(user);
             userService.assignRole(user, request.getRequestedRole());
             roleAuditService.logRoleChange("ASSIGNED", user, role, "Admin");
@@ -181,6 +183,21 @@ public class AdminController {
         }
     }
 
+    @GetMapping("/tasks")
+    public ResponseEntity<?> getTasks(@RequestParam String activity) {
+        try {
+            Activity activityEntity = activityService.findByName(activity);
+            if (activityEntity == null) {
+                return ResponseEntity.badRequest().body("Activity not found");
+            }
+            List<Task> tasks = taskService.findByActivity(activityEntity);
+            return ResponseEntity.ok(tasks);
+        } catch (Exception e) {
+            logger.error("Error fetching tasks", e);
+            return ResponseEntity.status(500).body("Error fetching tasks");
+        }
+    }
+
     @PostMapping("/configuration/save")
     public ResponseEntity<String> saveConfiguration(@RequestBody ProjectConfigurationDTO projectConfig) {
         try {
@@ -222,6 +239,27 @@ public class AdminController {
         } catch (Exception e) {
             logger.error("Error saving configuration", e);
             return ResponseEntity.status(500).body("Error saving configuration");
+        }
+    }
+
+    @PutMapping("/tasks/{taskId}")
+    public ResponseEntity<String> updateTask(@PathVariable Long taskId, @RequestBody TaskDTO taskDTO) {
+        taskService.updateTask(taskId, taskDTO);
+        return ResponseEntity.ok("Configuration update successfully.");
+    }
+
+    @GetMapping("/tasks/{taskId}")
+    public ResponseEntity<?> getTaskById(@PathVariable Long taskId) {
+        try {
+            Optional<Task> task = taskService.getTaskById(taskId);
+            if (task.isPresent()) {
+                return ResponseEntity.ok(task.get());
+            } else {
+                return ResponseEntity.badRequest().body("Task not found with id: " + taskId);
+            }
+        } catch (Exception e) {
+            logger.error("Error fetching activities", e);
+            return ResponseEntity.status(500).body("Error fetching activities");
         }
     }
 }

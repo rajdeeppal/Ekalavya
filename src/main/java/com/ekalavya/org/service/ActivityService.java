@@ -2,7 +2,6 @@ package com.ekalavya.org.service;
 
 import com.ekalavya.org.entity.Activity;
 import com.ekalavya.org.entity.Component;
-import com.ekalavya.org.entity.Task;
 import com.ekalavya.org.repository.ActivityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,5 +24,9 @@ public class ActivityService {
 
     public Activity save(Activity activity) {
         return activityRepository.save(activity);
+    }
+
+    public Activity findByName(String activity) {
+        return activityRepository.findByActivityName(activity);
     }
 }

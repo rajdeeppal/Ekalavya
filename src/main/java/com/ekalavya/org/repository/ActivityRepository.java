@@ -12,4 +12,6 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
     Activity findByActivityNameAndComponent(String name, Component component);
 
     List<Activity> findByComponent(Component componentEntity);
+
+    Activity findByActivityName(String activity);
 }
