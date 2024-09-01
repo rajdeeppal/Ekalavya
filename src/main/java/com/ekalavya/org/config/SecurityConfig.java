@@ -29,8 +29,7 @@ public class SecurityConfig {
             .securityMatchers((matchers) -> matchers.requestMatchers("/admin/**"))
             .authorizeHttpRequests((authz) -> authz
                     .requestMatchers("/admins/**").hasAnyRole("SPWAdmin")
-                    .requestMatchers("/admin/**").permitAll()
-                    //.requestMatchers("/admin/login", "/admin/validateOtp", "/admin/sendOtp").permitAll()
+                    .requestMatchers("/admin/login", "/admin/validateOtp", "/admin/sendOtp").permitAll()
                     .anyRequest().authenticated()
             )
             .formLogin((form) -> form
