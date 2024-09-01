@@ -58,11 +58,11 @@ public class UserService {
 		return new User();
 	}
 	
-	public void removeUserById(String id) {
-		boolean userExist = userRepository.existsById(Long.parseLong(id));
-		Optional<User> user = userRepository.findById(Long.parseLong(id));
+	public void removeUserById(Long id) {
+		boolean userExist = userRepository.existsById(id);
+		Optional<User> user = userRepository.findById(id);
 		if(userExist) {
-			userRepository.deleteById(Long.parseLong(id));
+			userRepository.deleteById(id);
 			logger.info("Role request is rejected for user: {}", user.get().getUsername());
 		}
 		else

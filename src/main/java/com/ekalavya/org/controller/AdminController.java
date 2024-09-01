@@ -128,9 +128,11 @@ public class AdminController {
         RoleRequest request = roleRequestService.approveRequest(requestId, approverComments);
         User user = request.getUser();
         Role role = roleService.getRoleByRolename(request.getRequestedRole());
-        if (role != null) {
+        if (role != null && user != null) {
+            user.setIsActive("Y");
             emailService.sendApprovalEmail(user);
             userService.assignRole(user, request.getRequestedRole());
+            userService.save(user);
             roleAuditService.logRoleChange("ASSIGNED", user, role, "Admin");
         }
         return "redirect:/admin/manageRoles";
@@ -138,7 +140,11 @@ public class AdminController {
 
     @PostMapping("/rejectRoleRequest")
     public String rejectRoleRequest(@RequestParam("requestId") Long requestId, @RequestParam("rejectionComments") String rejectionComments) {
-        roleRequestService.rejectRequest(requestId, rejectionComments);
+        RoleRequest request = roleRequestService.rejectRequest(requestId, rejectionComments);
+        User user = request.getUser();
+        if(user != null){
+            userService.removeUserById(user.getId());
+        }
         return "redirect:/admin/manageRoles";
     }
 

@@ -18,7 +18,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        com.ekalavya.org.entity.User user = userRepository.findByUsername(username)
+        com.ekalavya.org.entity.User user = userRepository.findByActiveEmpId(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         return new User(user.getUsername(), user.getPassword(),

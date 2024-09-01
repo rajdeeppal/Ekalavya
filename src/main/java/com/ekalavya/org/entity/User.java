@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Table(name = "users")
@@ -30,4 +29,10 @@ public class User {
 
 	@Column(unique = true)
 	private Long empId;
+
+	public User() {
+		this.isActive = "N";
+	}
+
+	private String isActive;
 }
