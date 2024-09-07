@@ -1,6 +1,18 @@
 import axios from 'axios';
 
 const BASE_URL = 'http://localhost:8080/admin'; // Update with your actual API URL
+const PM_BASE_URL = 'http://localhost:8080/user/pm';
+
+// Fetch all Projects created by PM **(Riya to use while add Beneficiary)
+export const getUserProjects = async (userId) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/projects/${userId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching Projects by USERID:', error);
+        throw error;
+    }
+};
 
 // Fetch all verticals
 export const getVerticals = async () => {
@@ -17,6 +29,17 @@ export const getVerticals = async () => {
 export const getComponents = async (vertical) => {
     try {
         const response = await axios.get(`${BASE_URL}/components`, { params: { vertical } });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching components:", error);
+        return [];
+    }
+};
+
+// Fetch components based on selected Project **(Riya to use while add Beneficiary)
+export const getComponentsByProject = async (project) => {
+    try {
+        const response = await axios.get(`${PM_BASE_URL}/components`, { params: { project } });
         return response.data;
     } catch (error) {
         console.error("Error fetching components:", error);
@@ -64,6 +87,16 @@ export const saveConfiguration = async (projectConfig) => {
         return response.data;
     } catch (error) {
         console.error("Error saving configuration:", error);
+    }
+};
+
+// Save the project **(Riya to use in Add Project)
+export const saveConfiguration = async (projectDto) => {
+    try {
+        const response = await axios.post(`${PM_BASE_URL}/project/save`, projectDto);
+        return response.data;
+    } catch (error) {
+        console.error("Error saving Project:", error);
     }
 };
 

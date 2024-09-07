@@ -1,5 +1,7 @@
 package com.ekalavya.org.config;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,13 +11,18 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
+
+import java.util.Set;
 
 @Configuration
 public class SecurityConfig {
@@ -64,7 +71,8 @@ public class SecurityConfig {
                 )
                 .formLogin((form) -> form
                         .loginPage("/user/login")
-                        .defaultSuccessUrl("/users/home", true)
+                        .successHandler(nonAdminAuthenticationSuccessHandler())
+                        //.defaultSuccessUrl("/users/home", true)
                         .failureUrl("/user/login?error=true")
                 )
                 .authenticationProvider(daoAuthenticationProvider())
@@ -105,6 +113,21 @@ public class SecurityConfig {
         daoAuthenticationProvider.setUserDetailsService(userDetailsService);
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         return daoAuthenticationProvider;
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler nonAdminAuthenticationSuccessHandler() {
+        return (HttpServletRequest request, HttpServletResponse response, Authentication authentication) -> {
+            Set<SimpleGrantedAuthority> authorities = (Set<SimpleGrantedAuthority>) authentication.getAuthorities();
+
+            if (authorities.contains(new SimpleGrantedAuthority("ROLE_PM"))) {
+                response.sendRedirect("/user/pm/dashboard");
+            } else if (authorities.contains(new SimpleGrantedAuthority("ROLE_CEO"))) {
+                response.sendRedirect("/user/ceo/dashboard");
+            } else {
+                response.sendRedirect("/users/home");
+            }
+        };
     }
 
 }
