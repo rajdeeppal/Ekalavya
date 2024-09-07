@@ -4,7 +4,6 @@ import com.ekalavya.org.DTO.TaskDTO;
 import com.ekalavya.org.entity.Activity;
 import com.ekalavya.org.entity.Task;
 import com.ekalavya.org.repository.TaskRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
