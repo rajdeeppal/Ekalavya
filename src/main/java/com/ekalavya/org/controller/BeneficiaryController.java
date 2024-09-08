@@ -5,6 +5,7 @@ import com.ekalavya.org.DTO.BeneficiaryResponse;
 import com.ekalavya.org.DTO.TaskCreationRequest;
 import com.ekalavya.org.service.BeneficiaryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ public class BeneficiaryController {
     @Autowired
     ObjectMapper objectMapper;
 
+    // TODO: add the update logic
     @PostMapping("/create")
     public ResponseEntity<String> addBeneficiary(@RequestBody BeneficiaryCreationRequest beneficiaryCreationRequest){
         return new ResponseEntity<>(beneficiaryService.addBeneficiary(beneficiaryCreationRequest), HttpStatus.CREATED);
@@ -35,8 +37,8 @@ public class BeneficiaryController {
     }
 
     @GetMapping
-    public BeneficiaryResponse getBeneficiary(@RequestParam long aadharNumber){
-        return beneficiaryService.getBeneficiary(aadharNumber);
+    public BeneficiaryResponse getBeneficiaryByAadhar(@RequestParam long aadharNumber){
+        return beneficiaryService.getBeneficiaryByAadhar(aadharNumber);
     }
 
     @GetMapping("/{projectName}")

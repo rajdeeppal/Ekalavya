@@ -11,9 +11,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -34,30 +37,56 @@ public class BeneficiaryService {
     @Autowired
     private ProjectRepository projectRepository;
 
+    @Transactional
     public String addBeneficiary(BeneficiaryCreationRequest bRequest){
+        M_Beneficiary beneficiary = null;
         try{
-
             M_Beneficiary beneficiaryRepositoryByAadharNumber = beneficiaryRepository.findByAadharNumber(bRequest.getAadharNumber());
-            /// if aadhar number and bname both are equal then it is a update request, else it is a duplicate entry, reject it
-            log.info("Received a Beneficiary Update Request : {}", bRequest);
             if(beneficiaryRepositoryByAadharNumber != null && bRequest.getBeneficiaryName().equals(beneficiaryRepositoryByAadharNumber.getName())){
-                /// update request
-                return null;
+                beneficiary = updateAndAddBeneficiaryDetails(beneficiaryRepositoryByAadharNumber, bRequest);
             }else if(beneficiaryRepositoryByAadharNumber != null && !bRequest.getBeneficiaryName().equals(beneficiaryRepositoryByAadharNumber.getName())){
                 throw new CustomException("Duplicate Aadhar Number not allowed !! ");
             }else{
-                log.info("Received a Beneficiary Creation Request : {}", bRequest);
-                M_Beneficiary beneficiary = parseRequestAndCreateDbObject(bRequest);
-                beneficiaryRepository.save(beneficiary);
-                return "SUCCESS";
+                beneficiary = parseRequestAndCreateDbObject(bRequest);
             }
+            beneficiaryRepository.save(beneficiary);
+            return "SUCCESS";
         }catch(Exception e){
             log.error("Exception Occurred : {}", e.getMessage());
             return "FAILURE";
         }
     }
 
-    public BeneficiaryResponse getBeneficiary(long aadharNumber){
+    private M_Beneficiary updateAndAddBeneficiaryDetails(M_Beneficiary beneficiaryEntity, BeneficiaryCreationRequest bRequest) {
+
+        log.info("Received a Beneficiary Update Request : {}", bRequest);
+        M_Component mComponent = new M_Component();
+        mComponent.setBeneficiary(beneficiaryEntity);
+        mComponent.setName(bRequest.getComponentName());
+
+        M_Activity mActivity = new M_Activity();
+        mActivity.setName(bRequest.getActivityName());
+        mActivity.setComponent(mComponent);
+
+        M_Task mTask = new M_Task();
+        mTask.setName(bRequest.getTaskName());
+        mTask.setTypeOfUnit(bRequest.getTypeOfUnit());
+        mTask.setUnits(bRequest.getUnits());
+        mTask.setRatePerUnit(bRequest.getRatePerUnit());
+        mTask.setTotalCost(bRequest.getTotalCost());
+        mTask.setBeneficiaryContribution(bRequest.getBeneficiaryContribution());
+        mTask.setGrantAmount(bRequest.getGrantAmount());
+        mTask.setYearOfSanction(bRequest.getYearOfSanction());
+        mTask.setActivity(mActivity);
+
+        mActivity.getTasks().add(mTask);
+        mComponent.getActivities().add(mActivity);
+        beneficiaryEntity.getComponents().add(mComponent);
+
+        return beneficiaryEntity;
+    }
+
+    public BeneficiaryResponse getBeneficiaryByAadhar(long aadharNumber){
         return objectMapper.convertValue(beneficiaryRepository.findByAadharNumber(aadharNumber), BeneficiaryResponse.class);
     }
 
@@ -94,6 +123,8 @@ public class BeneficiaryService {
 
 
     private M_Beneficiary parseRequestAndCreateDbObject(BeneficiaryCreationRequest bRequest) {
+
+        log.info("Received a Beneficiary Creation Request : {}", bRequest);
 
         Project project = projectRepository.findByProjectName(bRequest.getProjectName());
 
