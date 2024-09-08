@@ -16,6 +16,7 @@ public class User {
 	private Long id;
 	
 	private String username;
+	@Transient
 	private String password;
 	private String emailid;
 	private String domain;

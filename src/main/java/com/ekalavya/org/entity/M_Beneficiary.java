@@ -22,14 +22,6 @@ public class M_Beneficiary {
         return name;
     }
 
-    public String getProjectName() {
-        return projectName;
-    }
-
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -77,7 +69,15 @@ public class M_Beneficiary {
 
     private Long aadharNumber;
 
-    private String projectName;
+    private Long projectId;
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
+    }
 
     @OneToMany(mappedBy = "beneficiary", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference

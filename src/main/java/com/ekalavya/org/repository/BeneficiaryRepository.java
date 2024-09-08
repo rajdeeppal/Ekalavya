@@ -9,6 +9,6 @@ public interface BeneficiaryRepository extends JpaRepository<M_Beneficiary, Long
 
     M_Beneficiary findByAadharNumber(long aadharNumber);
 
-    List<M_Beneficiary> findByProjectName(String projectName);
+    List<M_Beneficiary> findByProjectId(long projectId);
 
 }

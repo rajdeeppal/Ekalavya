@@ -38,13 +38,19 @@ public class BeneficiaryService {
         try{
 
             M_Beneficiary beneficiaryRepositoryByAadharNumber = beneficiaryRepository.findByAadharNumber(bRequest.getAadharNumber());
-            if(beneficiaryRepositoryByAadharNumber != null){
+            /// if aadhar number and bname both are equal then it is a update request, else it is a duplicate entry, reject it
+            log.info("Received a Beneficiary Update Request : {}", bRequest);
+            if(beneficiaryRepositoryByAadharNumber != null && bRequest.getBeneficiaryName().equals(beneficiaryRepositoryByAadharNumber.getName())){
+                /// update request
+                return null;
+            }else if(beneficiaryRepositoryByAadharNumber != null && !bRequest.getBeneficiaryName().equals(beneficiaryRepositoryByAadharNumber.getName())){
                 throw new CustomException("Duplicate Aadhar Number not allowed !! ");
+            }else{
+                log.info("Received a Beneficiary Creation Request : {}", bRequest);
+                M_Beneficiary beneficiary = parseRequestAndCreateDbObject(bRequest);
+                beneficiaryRepository.save(beneficiary);
+                return "SUCCESS";
             }
-            log.info("Received a Beneficiary Creation Request : {}", bRequest);
-            M_Beneficiary beneficiary = parseRequestAndCreateDbObject(bRequest);
-            beneficiaryRepository.save(beneficiary);
-            return "SUCCESS";
         }catch(Exception e){
             log.error("Exception Occurred : {}", e.getMessage());
             return "FAILURE";
@@ -57,7 +63,10 @@ public class BeneficiaryService {
 
 
     public List<BeneficiaryResponse> getBeneficiaryByProjectName(String projectName){
-        return objectMapper.convertValue(beneficiaryRepository.findByProjectName(projectName), objectMapper.getTypeFactory().constructCollectionType(List.class, BeneficiaryResponse.class));
+
+        Long projectId = projectRepository.findByProjectName(projectName).getId();
+
+        return objectMapper.convertValue(beneficiaryRepository.findByProjectId(projectId), objectMapper.getTypeFactory().constructCollectionType(List.class, BeneficiaryResponse.class));
     }
 
 
@@ -86,10 +95,12 @@ public class BeneficiaryService {
 
     private M_Beneficiary parseRequestAndCreateDbObject(BeneficiaryCreationRequest bRequest) {
 
+        Project project = projectRepository.findByProjectName(bRequest.getProjectName());
+
         M_Beneficiary beneficiary = new M_Beneficiary();
         beneficiary.setName(bRequest.getBeneficiaryName());
         beneficiary.setGuardianName(bRequest.getGuardianName());
-        beneficiary.setProjectName(bRequest.getProjectName());
+        beneficiary.setProjectId(project.getId());
 
         AddressDetails addressDetails = new AddressDetails();
         addressDetails.setVillageName(bRequest.getVillageName());

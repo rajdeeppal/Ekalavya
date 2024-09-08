@@ -20,7 +20,7 @@ public class Project {
     @JoinTable(name = "vertical_id")
     private Vertical vertical;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
 
