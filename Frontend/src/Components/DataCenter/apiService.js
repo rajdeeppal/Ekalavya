@@ -6,7 +6,7 @@ const PM_BASE_URL = 'http://localhost:8080/user/pm';
 // Fetch all Projects created by PM **(Riya to use while add Beneficiary)
 export const getUserProjects = async (userId) => {
     try {
-        const response = await axios.get(`${BASE_URL}/projects/${userId}`);
+        const response = await axios.get(`${PM_BASE_URL}/projects/${userId}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching Projects by USERID:', error);
