@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/beneficiary")
@@ -41,8 +42,8 @@ public class BeneficiaryController {
         return beneficiaryService.getBeneficiaryByAadhar(aadharNumber);
     }
 
-    @GetMapping("/{projectName}")
-    public List<BeneficiaryResponse> getBeneficiaryByProjectName(@PathVariable String projectName){
-        return beneficiaryService.getBeneficiaryByProjectName(projectName);
+    @PostMapping("/criteriaSearch")
+    public List<BeneficiaryResponse> getBeneficiaryByProjectName(@RequestBody Map<String, String> params){
+        return beneficiaryService.getBeneficiaryByProjectName(params);
     }
 }

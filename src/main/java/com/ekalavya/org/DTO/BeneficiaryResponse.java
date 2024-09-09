@@ -10,8 +10,10 @@ import java.util.List;
 public class BeneficiaryResponse {
     private String name;
     private String guardianName;
-    @Embedded
-    private AddressDetails addressDetails;
+    private String villageName;
+    private String mandalName;
+    private String districtName;
+    private String stateName;
 
     private Long aadharNumber;
     private List<ComponentResponse> components;

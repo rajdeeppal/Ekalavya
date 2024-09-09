@@ -34,14 +34,6 @@ public class M_Beneficiary {
         this.guardianName = guardianName;
     }
 
-    public AddressDetails getAddressDetails() {
-        return addressDetails;
-    }
-
-    public void setAddressDetails(AddressDetails addressDetails) {
-        this.addressDetails = addressDetails;
-    }
-
     public Long getAadharNumber() {
         return aadharNumber;
     }
@@ -64,8 +56,47 @@ public class M_Beneficiary {
 
     private String name;
     private String guardianName;
-    @Embedded
-    private AddressDetails addressDetails;
+//    @Embedded
+//    private AddressDetails addressDetails;
+
+    private String stateName;
+
+    public String getStateName() {
+        return stateName;
+    }
+
+    public void setStateName(String stateName) {
+        this.stateName = stateName;
+    }
+
+    private String villageName;
+
+    public String getVillageName() {
+        return villageName;
+    }
+
+    public void setVillageName(String villageName) {
+        this.villageName = villageName;
+    }
+
+    public String getMandalName() {
+        return mandalName;
+    }
+
+    public void setMandalName(String mandalName) {
+        this.mandalName = mandalName;
+    }
+
+    public String getDistrictName() {
+        return districtName;
+    }
+
+    public void setDistrictName(String districtName) {
+        this.districtName = districtName;
+    }
+
+    private String mandalName;
+    private String districtName;
 
     private Long aadharNumber;
 

@@ -3,20 +3,14 @@ package com.ekalavya.org.service;
 import com.ekalavya.org.DTO.*;
 import com.ekalavya.org.entity.*;
 import com.ekalavya.org.exception.CustomException;
-import com.ekalavya.org.repository.BeneficiaryRepository;
-import com.ekalavya.org.repository.MActivityRepository;
-import com.ekalavya.org.repository.MTaskRepository;
-import com.ekalavya.org.repository.ProjectRepository;
+import com.ekalavya.org.repository.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -36,6 +30,9 @@ public class BeneficiaryService {
 
     @Autowired
     private ProjectRepository projectRepository;
+
+    @Autowired
+    private CustomBeneficiaryRepository customBeneficiaryRepository;
 
     @Transactional
     public String addBeneficiary(BeneficiaryCreationRequest bRequest){
@@ -91,11 +88,11 @@ public class BeneficiaryService {
     }
 
 
-    public List<BeneficiaryResponse> getBeneficiaryByProjectName(String projectName){
+    public List<BeneficiaryResponse> getBeneficiaryByProjectName(Map<String, String> params){
 
-        Long projectId = projectRepository.findByProjectName(projectName).getId();
+        //Long projectId = projectRepository.findByProjectName(projectName).getId();
 
-        return objectMapper.convertValue(beneficiaryRepository.findByProjectId(projectId), objectMapper.getTypeFactory().constructCollectionType(List.class, BeneficiaryResponse.class));
+        return objectMapper.convertValue(customBeneficiaryRepository.findBeneficiariesBasedOnCriteria(params), objectMapper.getTypeFactory().constructCollectionType(List.class, BeneficiaryResponse.class));
     }
 
 
@@ -133,13 +130,11 @@ public class BeneficiaryService {
         beneficiary.setGuardianName(bRequest.getGuardianName());
         beneficiary.setProjectId(project.getId());
 
-        AddressDetails addressDetails = new AddressDetails();
-        addressDetails.setVillageName(bRequest.getVillageName());
-        addressDetails.setStateName(bRequest.getStateName());
-        addressDetails.setMandalName(bRequest.getMandalName());
-        addressDetails.setDistrictName(bRequest.getDistrictName());
+        beneficiary.setVillageName(bRequest.getVillageName());
+        beneficiary.setStateName(bRequest.getStateName());
+        beneficiary.setMandalName(bRequest.getMandalName());
+        beneficiary.setDistrictName(bRequest.getDistrictName());
 
-        beneficiary.setAddressDetails(addressDetails);
         beneficiary.setAadharNumber(bRequest.getAadharNumber());
 
 
