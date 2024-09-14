@@ -106,12 +106,11 @@ public class AdminController {
 //    }
 
 
-//    @GetMapping("/manageRoles")
-//    public String manageRoles(Model model) {
-//        List<RoleRequest> pendingRequests = roleRequestService.getPendingRequests();
-//        model.addAttribute("pendingRequests", pendingRequests);
-//        return "admin/manageRoles";
-//    }
+    @GetMapping("/manageRoles")
+    public List<RoleRequest> manageRoles() {
+        List<RoleRequest> pendingRequests = roleRequestService.getPendingRequests();
+        return  pendingRequests;
+    }
 
     @PostMapping("/approveRoleRequest")
     public String approveRoleRequest(@RequestParam("requestId") Long requestId, @RequestParam("approverComments") String approverComments) throws MessagingException, TemplateException, IOException {
