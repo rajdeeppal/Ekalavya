@@ -5,8 +5,8 @@ import lombok.Data;
 @Data
 public class UserCreateRequest {
     private String username;
-    private String empId;
+    private String password;
     private String domain;
     private String emailId;
-    private String role;
+    private String requestedRole;
 }
