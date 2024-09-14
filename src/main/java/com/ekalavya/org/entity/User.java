@@ -1,10 +1,8 @@
 package com.ekalavya.org.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-
-import java.util.HashSet;
-import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 @Entity
 @AllArgsConstructor
@@ -16,7 +14,6 @@ public class User {
 	private Long id;
 	
 	private String username;
-	@Transient
 	private String password;
 	private String emailid;
 	private String domain;
