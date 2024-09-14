@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class OtpService {
@@ -27,26 +28,26 @@ public class OtpService {
 
     private static final Logger logger = LoggerFactory.getLogger(OtpService.class);
 
-//    public String generateAndSendOtp(String username) {
-//        String otp = String.valueOf(new Random().nextInt(999999));
-//
-//        User user = userRepository.findByUsername(username);
-//
-//        OtpDetails otpDbObject = new OtpDetails();
-//        otpDbObject.setUsername(username);
-//        otpDbObject.setEmail(user.get().getEmailid());
-//        otpDbObject.setOtp(otp);
-//        otpDbObject.setOtpTimestamp(LocalDateTime.now());
-//        otpDbObject.setAlreadyValidated(false);
-//        try {
-//            otpRepository.save(otpDbObject);
-//            emailService.sendOtpEmail(otpDbObject.getEmail(), otp);
-//        } catch (Exception e) {
-//            logger.info("Unable to send OTP!!");
-//            return null;
-//        }
-//        return otpDbObject.getEmail();
-//    }
+    public String generateAndSendOtp(String username) {
+        String otp = String.valueOf(new Random().nextInt(999999));
+
+        Optional<User> user = userRepository.findByUsername(username);
+
+        OtpDetails otpDbObject = new OtpDetails();
+        otpDbObject.setUsername(username);
+        otpDbObject.setEmail(user.get().getEmailid());
+        otpDbObject.setOtp(otp);
+        otpDbObject.setOtpTimestamp(LocalDateTime.now());
+        otpDbObject.setAlreadyValidated(false);
+        try {
+            otpRepository.save(otpDbObject);
+            emailService.sendOtpEmail(otpDbObject.getEmail(), otp);
+        } catch (Exception e) {
+            logger.info("Unable to send OTP!!");
+            return null;
+        }
+        return otpDbObject.getEmail();
+    }
 
     public boolean validateOtp(String username, String otp) {
         OtpDetails otpDetails = otpRepository.findByUsername(username);
