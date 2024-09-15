@@ -23,3 +23,14 @@ jobs:
       - name: Publish image to Dccker hub
         run: docker push ekalavya/ekalavya:latest
 
+  deploy:
+    needs: build
+    runs-on: [aws-ec2]
+    steps:
+      - name: Pull image from Dockerhub
+        run: docker pull ekalavya/ekalavya:latest
+      - name: Delete old container
+        run: docker rm -f ekalavya/ekalavya
+      - name: Run Docker Container
+        run: docker run -d -p 8080:8080 --name ekalavya-backend-service ekalavya/ekalavya
+
