@@ -133,6 +133,8 @@ public class BeneficiaryService {
             task.setBeneficiaryContribution(taskCreationRequest.getBeneficiaryContribution());
             task.setGrantAmount(taskCreationRequest.getGrantAmount());
             task.setYearOfSanction(taskCreationRequest.getYearOfSanction());
+            task.setBalanceRemaining(taskCreationRequest.getTotalCost());
+            task.setUnitRemain(taskCreationRequest.getUnits());
             task.setActivity(mActivity);
             mTaskRepository.save(task);
             return "SUCCESS";
@@ -210,8 +212,12 @@ public class BeneficiaryService {
             task.setBeneficiaryContribution(taskCreationRequest.getBeneficiaryContribution());
             task.setGrantAmount(taskCreationRequest.getGrantAmount());
             task.setYearOfSanction(taskCreationRequest.getYearOfSanction());
-            task.setBalanceRemaining(taskCreationRequest.getTotalCost());
-            task.setUnitRemain(taskCreationRequest.getUnits());
+            if(taskCreationRequest.getTotalCost() != null ){
+                task.setBalanceRemaining(taskCreationRequest.getTotalCost());
+            }
+            if( taskCreationRequest.getUnits() > 0 ){
+                task.setUnitRemain(taskCreationRequest.getUnits());
+            }
             mTaskRepository.save(task);
             return "SUCCESS";
         } catch (Exception e) {
