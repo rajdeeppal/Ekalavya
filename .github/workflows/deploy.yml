@@ -15,7 +15,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - name: Build Project
-        run : mvn clean package -Dspring.profiles.active=local
+        run : mvn clean package -Dspring.profiles.active=aws
       - name: Login to Dockerhub
         run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
       - name: Build Docker Image
