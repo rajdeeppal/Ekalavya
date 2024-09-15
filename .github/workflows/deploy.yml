@@ -1,4 +1,4 @@
-name: CICI
+name: CICD
 
 on:
   push:
