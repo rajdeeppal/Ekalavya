@@ -19,18 +19,19 @@ jobs:
       - name: Login to Dockerhub
         run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
       - name: Build Docker Image
-        run: docker build -t iamdebjit3107/ekalavya .
+        run: docker build -t iamdebjit3107/ekalavya:${{ github.sha }} .
       - name: Publish image to Dccker hub
-        run: docker push iamdebjit3107/ekalavya:latest
+        run: docker push iamdebjit3107/ekalavya:${{ github.sha }}
 
   deploy:
     needs: build
     runs-on: [ekalavya-aws-ec2]
     steps:
       - name: Pull image from Dockerhub
-        run: docker pull iamdebjit3107/ekalavya:latest
+        run: docker pull iamdebjit3107/ekalavya:${{ github.sha }}
       - name: Delete old container
-        run: docker rm -f iamdebjit3107/ekalavya
+        run: |
+            docker ps -a -q --filter "name=ekalavya-backend-service" | xargs -r docker rm -f
       - name: Run Docker Container
-        run: docker run -d -p 8080:8080 --name ekalavya-backend-service iamdebjit3107/ekalavya
+        run: docker run -d -p 8080:8080 --name ekalavya-backend-service iamdebjit3107/ekalavya:${{ github.sha }}
 
