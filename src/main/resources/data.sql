@@ -9,7 +9,7 @@ VALUES ('rajdeep108pal@gmail.com', 'Admin', false);
 
 
 
--- Beneficiaries Init
+-- Beneficiaries Init---
 
 select * from m_beneficiary;
 select * from m_component;
