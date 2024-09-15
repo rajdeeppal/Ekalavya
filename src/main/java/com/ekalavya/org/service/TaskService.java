@@ -28,9 +28,8 @@ public class TaskService {
         Task existingTask = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found with id " + taskId));
         existingTask.setTaskName(updatedTask.getTaskName());
-        existingTask.setUnits(String.valueOf(updatedTask.getUnits()));
-        existingTask.setRatePerUnit(String.valueOf(updatedTask.getRatePerUnit()));
-
+        existingTask.setUnits(updatedTask.getUnits());
+        existingTask.setRatePerUnit(updatedTask.getRatePerUnit());
         taskRepository.save(existingTask);
     }
 

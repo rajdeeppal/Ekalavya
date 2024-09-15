@@ -12,6 +12,6 @@ import lombok.Setter;
 public class TaskDTO {
     private Long id;
     private String taskName;
-    private int units;
-    private double ratePerUnit;
+    private String units;
+    private String ratePerUnit;
 }

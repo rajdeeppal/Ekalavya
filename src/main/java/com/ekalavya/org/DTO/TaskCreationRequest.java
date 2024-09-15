@@ -8,10 +8,10 @@ public class TaskCreationRequest {
     private String name;
     private String typeOfUnit;
     private int units;
-    private String ratePerUnit;
-    private int totalCost;
+    private Long ratePerUnit;
+    private Long totalCost;
     private int beneficiaryContribution;
-    private int grantAmount;
+    private Long grantAmount;
     private int yearOfSanction;
 
 
