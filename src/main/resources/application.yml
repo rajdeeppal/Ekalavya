@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: Ekalavya
+
+  # DataSource Configuration
+  datasource:
+    url: jdbc:postgresql://ekalavya-db.c106aq42gehb.ap-south-1.rds.amazonaws.com:5432/ekalavya_db
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+    initialization-mode: always
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  # DevTools Configuration
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+
+  # Mail Configuration
+  mail:
+    host: smtp.gmail.com
+    username: chittaranjanpal049@gmail.com
+    password: biwriurddpmcnwgh
+    port: 587
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  main:
+    allow-bean-definition-overriding: true
+
+  freemarker:
+    template-loader-path: classpath:/templates/email-template/
+    suffix: .ftl
+
+# Server Configuration
+server:
+  port: 8080
+
+# Logging Configuration
+logging:
+  level:
+    com.ekalavya.org: INFO
