@@ -25,7 +25,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: [aws-ec2]
+    runs-on: [ekalavya-aws-ec2]
     steps:
       - name: Pull image from Dockerhub
         run: docker pull iamdebjit3107/ekalavya:latest
