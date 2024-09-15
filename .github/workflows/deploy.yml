@@ -1,0 +1,25 @@
+name: CICI
+
+on:
+  push:
+    branches: [dev]
+jobs:
+  build:
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v3
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Build Project
+        run : mvn clean install
+      - name: Login to Dockerhub
+        run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
+      - name: Build Docker Image
+        run: docker build -t ekalavya/ekalavya .
+      - name: Publish image to Dccker hub
+        run: docker push ekalavya/ekalavya:latest
+
