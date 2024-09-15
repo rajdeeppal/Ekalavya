@@ -3,6 +3,7 @@ package com.ekalavya.org.controller;
 import com.ekalavya.org.DTO.AuthRequest;
 import com.ekalavya.org.DTO.AuthResponse;
 import com.ekalavya.org.DTO.UserCreateRequest;
+import com.ekalavya.org.entity.User;
 import com.ekalavya.org.service.AuthenticationService;
 import com.ekalavya.org.service.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +45,7 @@ public class AuthenticationController {
 
             // If authentication is successful, generate JWT token
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            String jwt = jwtUtil.generateToken(userDetails.getUsername());
+            String jwt = jwtUtil.generateToken(userDetails);
 
             log.info("Logged in user : {}", userDetails.getUsername());
 
