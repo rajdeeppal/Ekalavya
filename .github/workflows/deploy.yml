@@ -33,5 +33,5 @@ jobs:
         run: |
             docker ps -a -q --filter "name=ekalavya-backend-service" | xargs -r docker rm -f
       - name: Run Docker Container
-        run: docker run -d -p 8080:8080 --name ekalavya-backend-service iamdebjit3107/ekalavya:${{ github.sha }}
+        run: docker run --restart unless-stopped -d -p 8080:8080 --name ekalavya-backend-service iamdebjit3107/ekalavya:${{ github.sha }}
 
