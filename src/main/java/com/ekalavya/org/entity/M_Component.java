@@ -13,7 +13,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name="m_component")
+@Table(
+        name = "m_component",
+        indexes = {
+                @Index(name = "idx_m_component_isCompleted", columnList = "isCompleted")
+        }
+)
 @Getter
 @Setter
 @AllArgsConstructor

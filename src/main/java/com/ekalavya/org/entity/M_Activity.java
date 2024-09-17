@@ -10,7 +10,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "m_activity")
+@Table(
+        name = "m_activity",
+        indexes = {
+                @Index(name = "idx_m_activity_isCompleted", columnList = "isCompleted")
+        }
+)
 @Getter
 @Setter
 @AllArgsConstructor
@@ -32,7 +37,7 @@ public class M_Activity {
 
     private String isCompleted;
 
-    public M_Activity(){
+    public M_Activity() {
         this.isCompleted = "N";
     }
 }

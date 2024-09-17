@@ -1,5 +1,6 @@
 package com.ekalavya.org.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -35,7 +36,8 @@ public class M_Beneficiary {
     private Long aadharNumber;
 
     @ManyToOne
-    @JoinColumn(name = "project_id")
+    @JsonBackReference
+    @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
     @OneToMany(mappedBy = "beneficiary", cascade = CascadeType.ALL, orphanRemoval = true)

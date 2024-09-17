@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-@Table(name="m_task_update")
+@Table(name = "m_task_update", indexes = {@Index(name = "idx_m_task_up_isCompleted", columnList = "isCompleted")})
 public class M_Task_Update {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

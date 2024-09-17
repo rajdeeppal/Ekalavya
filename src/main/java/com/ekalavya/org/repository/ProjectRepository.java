@@ -2,6 +2,8 @@ package com.ekalavya.org.repository;
 
 import com.ekalavya.org.entity.Project;
 import com.ekalavya.org.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,4 +17,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     List<Project> findActiveProjectByUser(@Param("user") User user);
 
     Project findByProjectName(String projectName);
+
+    @Query("SELECT p FROM Project p WHERE p.terminate = 'N'")
+    Page<Project> findIncompleteProjects(Pageable pageable);
 }

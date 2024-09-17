@@ -12,7 +12,12 @@ import java.util.Set;
 @Getter
 @Setter
 @AllArgsConstructor
-@Table(name="m_task")
+@Table(
+        name = "m_task",
+        indexes = {
+                @Index(name = "idx_m_task_isCompleted", columnList = "isCompleted")
+        }
+)
 public class M_Task {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -30,7 +35,7 @@ public class M_Task {
     private Long balanceRemaining;
     private String isCompleted;
 
-    public M_Task(){
+    public M_Task() {
         this.isCompleted = "N";
     }
 
