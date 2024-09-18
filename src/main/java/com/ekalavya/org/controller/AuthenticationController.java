@@ -2,9 +2,6 @@ package com.ekalavya.org.controller;
 
 import com.ekalavya.org.DTO.AuthRequest;
 import com.ekalavya.org.DTO.AuthResponse;
-import com.ekalavya.org.DTO.UserCreateRequest;
-import com.ekalavya.org.entity.User;
-import com.ekalavya.org.service.AuthenticationService;
 import com.ekalavya.org.service.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +27,6 @@ public class AuthenticationController {
 
     @Autowired
     private UserDetailsService userDetailsService;
-
-    @Autowired
-    private AuthenticationService authenticationService;
 
 
     @PostMapping("/login")
