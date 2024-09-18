@@ -58,15 +58,6 @@ public class AuthenticationController {
         }
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserCreateRequest userCreateRequest){
-        authenticationService.createUser(userCreateRequest);
-        return null;
-    }
-
-
-
-
     @GetMapping("/welcome")
     public String getWelcome(){
         return "Welcome to Ekalavya !!";
