@@ -53,8 +53,8 @@ public class BeneficiaryController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @GetMapping
-    public BeneficiaryResponse getAllBeneficiaries() {
+    @GetMapping("/getBeneficiaryList")
+    public List<BeneficiaryResponse> getAllBeneficiaries() {
         return beneficiaryService.getAllBeneficiaries();
     }
 

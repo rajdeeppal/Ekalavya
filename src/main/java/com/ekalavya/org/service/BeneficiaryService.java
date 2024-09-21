@@ -108,8 +108,11 @@ public class BeneficiaryService {
 //        return beneficiaryEntity;
 //    }
 
-    public BeneficiaryResponse getAllBeneficiaries() {
-        return objectMapper.convertValue(beneficiaryRepository.findAll(), BeneficiaryResponse.class);
+    public List<BeneficiaryResponse> getAllBeneficiaries() {
+        List<M_Beneficiary> beneficiaries = beneficiaryRepository.findAll();
+        return beneficiaries.stream()
+                .map(mBeneficiary -> objectMapper.convertValue(mBeneficiary, BeneficiaryResponse.class))
+                .collect(Collectors.toList());
     }
 
 
