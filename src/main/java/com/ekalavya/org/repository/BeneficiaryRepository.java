@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface BeneficiaryRepository extends JpaRepository<M_Beneficiary, Long> {
 
-    M_Beneficiary findByAadharNumber(long aadharNumber);
+    //M_Beneficiary findByAadharNumber(long aadharNumber);
 
     @Query("SELECT e FROM M_Beneficiary e WHERE e.project = :project AND e.aadharNumber = :aadhar AND e.terminate = 'N'")
     M_Beneficiary findByAadharAndProjectAndProjectTermination(@Param("project") Project project, @Param("aadhar") Long aadhar);

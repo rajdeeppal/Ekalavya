@@ -54,11 +54,11 @@ public class BeneficiaryController {
     }
 
     @GetMapping
-    public BeneficiaryResponse getBeneficiaryByAadhar(@RequestParam long aadharNumber) {
-        return beneficiaryService.getBeneficiaryByAadhar(aadharNumber);
+    public BeneficiaryResponse getAllBeneficiaries() {
+        return beneficiaryService.getAllBeneficiaries();
     }
 
-    @PreAuthorize("hasAuthority('TRUSTEE')")
+    //@PreAuthorize("hasAuthority('TRUSTEE')")
     @PostMapping("/criteriaSearch")
     public List<BeneficiaryResponse> getBeneficiaryByProjectName(@RequestBody Map<String, String> params) {
         return beneficiaryService.getBeneficiaryByProjectName(params);

@@ -108,8 +108,8 @@ public class BeneficiaryService {
 //        return beneficiaryEntity;
 //    }
 
-    public BeneficiaryResponse getBeneficiaryByAadhar(long aadharNumber) {
-        return objectMapper.convertValue(beneficiaryRepository.findByAadharNumber(aadharNumber), BeneficiaryResponse.class);
+    public BeneficiaryResponse getAllBeneficiaries() {
+        return objectMapper.convertValue(beneficiaryRepository.findAll(), BeneficiaryResponse.class);
     }
 
 
