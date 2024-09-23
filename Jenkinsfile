@@ -54,7 +54,7 @@ pipeline {
                         docker pull ${env.IMAGE_NAME}:${env.BUILD_ID}
                         docker stop ekalavya-app || true
                         docker rm ekalavya-app || true
-                        docker run -d --name ekalavya-app -p 61002:61002 ${env.IMAGE_NAME}:${env.BUILD_ID}
+                        docker run -d --name ekalavya-app -p 61002:61002 ${env.IMAGE_NAME}:${env.BUILD_ID} << EOF
                         EOF
                     """
                 }
