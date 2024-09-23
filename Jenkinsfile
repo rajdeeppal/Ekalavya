@@ -52,8 +52,8 @@ pipeline {
                     sh """
                         ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${EC2_USER}@${EC2_HOST} << EOF
                         docker pull ${env.IMAGE_NAME}:${env.BUILD_ID}
-                        docker stop your-app-container || true
-                        docker rm your-app-container || true
+                        docker stop ekalavya-app || true
+                        docker rm ekalavya-app || true
                         docker run -d --name ekalavya-app -p 61001:61001 ${env.IMAGE_NAME}:${env.BUILD_ID}
                         EOF
                     """
