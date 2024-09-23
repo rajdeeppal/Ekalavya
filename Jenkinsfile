@@ -13,10 +13,11 @@ pipeline {
     stages {
         stage('Clone repository') {
             steps {
-                // Clone the GitHub repository
-                git 'https://github.com/your-github-username/your-repository.git'
+                // Clone a specific branch from the GitHub repository
+                git branch: 'dev', url: 'https://github.com/rajdeeppal/Ekalavya.git'
             }
         }
+
 
         stage('Build with Maven') {
             steps {
