@@ -7,7 +7,7 @@ pipeline {
         SSH_KEY = credentials('ec2-ssh-key') // SSH key stored in Jenkins to connect to EC2
         IMAGE_NAME = 'iamdebjit3107/ekalavya'
         EC2_USER = 'ec2-user'
-        EC2_HOST = 'your-ec2-instance-ip'
+        EC2_HOST = '3.111.84.98'
     }
 
     stages {
@@ -54,7 +54,7 @@ pipeline {
                         docker pull ${env.IMAGE_NAME}:${env.BUILD_ID}
                         docker stop your-app-container || true
                         docker rm your-app-container || true
-                        docker run -d --name your-app-container -p 8080:8080 ${env.IMAGE_NAME}:${env.BUILD_ID}
+                        docker run -d --name ekalavya-app -p 61001:61001 ${env.IMAGE_NAME}:${env.BUILD_ID}
                         EOF
                     """
                 }
