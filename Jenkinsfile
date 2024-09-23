@@ -51,14 +51,15 @@ pipeline {
                     // SSH into the EC2 instance, pull the image from DockerHub, and run the container
                     sh """
                         #!/bin/bash
-                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${EC2_USER}@${EC2_HOST} <<EOF
+                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${EC2_USER}@${EC2_HOST} << 'EOF'
                         docker pull ${env.IMAGE_NAME}:${env.BUILD_ID}
                         docker stop ekalavya-app || true
                         docker rm ekalavya-app || true
                         docker run -d --name ekalavya-app -p 61002:61002 ${env.IMAGE_NAME}:${env.BUILD_ID}
-                        EOF
+                EOF
                     """
                 }
+
 
 
             }
