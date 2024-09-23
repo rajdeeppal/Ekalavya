@@ -55,7 +55,7 @@ public class BeneficiaryService {
         try {
             Project project = projectService.findByName(bRequest.getProjectName());
             boolean checkAdmision = checkRestrictToAssignProject(bRequest.getAadharNumber(), project);
-            if (!checkAdmision) {
+            if (checkAdmision) {
                 M_Beneficiary beneficiaryRepositoryByAadharNumber = beneficiaryRepository.
                         findByAadharAndProjectAndProjectTermination(project, bRequest.getAadharNumber());
                 if (beneficiaryRepositoryByAadharNumber != null && bRequest.getBeneficiaryName().equals(beneficiaryRepositoryByAadharNumber.getName())) {
@@ -78,8 +78,11 @@ public class BeneficiaryService {
 
     private boolean checkRestrictToAssignProject(Long aadharNumber, Project assignProject) {
         List<M_Beneficiary> m_beneficiary = beneficiaryRepository.findByAadharNumberAndProjectTermination(aadharNumber);
-        m_beneficiary.removeIf(beneficiary -> !beneficiary.getProject().equals(assignProject));
-        return m_beneficiary.size() > 0;
+        if(m_beneficiary.isEmpty()){
+            return true;
+        }
+        m_beneficiary.removeIf(beneficiary -> beneficiary.getProject().equals(assignProject));
+        return m_beneficiary.isEmpty();
     }
 
 //    private M_Beneficiary updateAndAddBeneficiaryDetails(M_Beneficiary beneficiaryEntity, BeneficiaryCreationRequest bRequest, Project project) {
