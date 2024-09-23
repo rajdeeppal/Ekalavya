@@ -6,7 +6,7 @@ pipeline {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials') // DockerHub credentials stored in Jenkins
         SSH_KEY = credentials('ec2-ssh-key') // SSH key stored in Jenkins to connect to EC2
         IMAGE_NAME = 'iamdebjit3107/ekalavya'
-        EC2_USER = 'ec2-user'
+        EC2_USER = 'ubuntu'
         EC2_HOST = '3.111.84.98'
     }
 
