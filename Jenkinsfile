@@ -63,8 +63,8 @@ pipeline {
 
     post {
         always {
-            // Clean up Docker images after build
-            sh 'docker rmi ${IMAGE_NAME}:${env.BUILD_ID} || true'
+            // Clean up Docker images after the build
+            sh "docker rmi ${IMAGE_NAME}:${env.BUILD_ID} || true"
         }
     }
 }
