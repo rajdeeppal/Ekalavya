@@ -61,18 +61,4 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            script {
-                // Stop and remove any containers using the image
-                sh """
-                    docker ps -a -q --filter ancestor=${IMAGE_NAME}:${env.BUILD_ID} | xargs -r docker stop
-                    docker ps -a -q --filter ancestor=${IMAGE_NAME}:${env.BUILD_ID} | xargs -r docker rm
-                """
-                // Remove the image
-                sh "docker rmi -f ${IMAGE_NAME}:${env.BUILD_ID} || true"
-            }
-        }
-    }
-
 }
