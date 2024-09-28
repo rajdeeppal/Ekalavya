@@ -1,5 +1,6 @@
 package com.ekalavya.org.service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -22,5 +23,9 @@ public class RoleService {
 			return role;
 		}
 		return null;
+	}
+
+	public List<Role> getAllRoles(){
+		return roleRepository.findAll();
 	}
 }
