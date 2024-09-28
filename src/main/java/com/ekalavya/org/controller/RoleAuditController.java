@@ -3,6 +3,8 @@ package com.ekalavya.org.controller;
 import java.util.List;
 
 import com.ekalavya.org.service.RoleService;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,7 @@ import com.ekalavya.org.repository.UserRepository;
 
 @RestController
 @RequestMapping("/roleAudit")
+@Slf4j
 public class RoleAuditController {
 	    
 	    @Autowired
@@ -49,31 +52,38 @@ public class RoleAuditController {
 	    	else {
 	    		Role role = new Role();
 	    		role.setName("UNASSIGN");
-	    		users = userRepository.findByIsActiveN();
+	    		users = userRepository.findByRoleIsNull();
 	    		List<Role> allRoles = roleRepository.findAll();
 	    	}
 			return ResponseEntity.status(HttpStatus.OK).body(users);
 	    }
-//
-//	    @PostMapping("/revokeRole")
-//	    public String revokeRole(@RequestParam("userId") Long userId, @RequestParam("roleId") Long roleId, Model model) {
-//	        // Find the user and role
-//	        User user = userRepository.findById(userId).orElse(null);
-//	        Role role = roleRepository.findById(roleId).orElse(null);
-//
-//
-//	        if (user != null && role != null) {
-//	        	RoleAudit roleAudit = roleAuditRepository.findByUser(user);
-//	            user.setRole(null);
-//	            userRepository.save(user);
-//	            if(roleAudit != null ) {
-//	            	roleAudit.setAction("REVOKED");
-//	            	roleAudit.setPerformedBy("Admin");
-//		            roleAuditRepository.save(roleAudit);
-//	            }
-//	        }
-//	        return "redirect:/admin/roleAudit?searchRole=" + role.getName();
-//	    }
+
+	    @PostMapping("/revokeRole")
+	    public ResponseEntity<?> revokeRole(@RequestParam("userId") Long userId, @RequestParam("roleId") Long roleId) {
+			/// for users who are already assigned a role
+	        try{
+				// Find the user and role
+				User user = userRepository.findById(userId).orElse(null);
+				Role role = roleRepository.findById(roleId).orElse(null);
+
+
+				if (user != null && role != null) {
+					RoleAudit roleAudit = roleAuditRepository.findByUser(user);
+					user.setRole(null);
+					userRepository.save(user);
+					if(roleAudit != null ) {
+						roleAudit.setAction("REVOKED");
+						roleAudit.setPerformedBy("Admin");
+						roleAuditRepository.save(roleAudit);
+					}
+					return ResponseEntity.ok().body(String.format("Role Revoked from user %s successfully!", user.getUsername()));
+				}
+			}catch(Exception e){
+				log.info("Exception occurred : {}", e.getMessage());
+				return ResponseEntity.ok().body(e.getMessage());
+			}
+			return null;
+	    }
 //
 //
 //	    @PostMapping("/changeRole")
