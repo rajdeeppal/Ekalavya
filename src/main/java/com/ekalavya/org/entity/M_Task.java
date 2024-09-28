@@ -33,7 +33,12 @@ public class M_Task {
     private int yearOfSanction;
     private int unitRemain;
     private Long balanceRemaining;
+    private int beneficiaryContributionRemain;
+    private Long grandTotalRemaining;
     private String isCompleted;
+
+/*    while viewing task (update/ edit/add) task update populate unitRemain, balanceRemaining, beneficiaryContributionRemain, grandTotalRemaining
+    instead of units, total cost, beneficiaryContribution, grantAmount as this will be the updated valuse*/
 
     public M_Task() {
         this.isCompleted = "N";

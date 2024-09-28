@@ -141,6 +141,8 @@ public class BeneficiaryService {
             task.setYearOfSanction(taskCreationRequest.getYearOfSanction());
             task.setBalanceRemaining(taskCreationRequest.getTotalCost());
             task.setUnitRemain(taskCreationRequest.getUnits());
+            task.setBeneficiaryContributionRemain(taskCreationRequest.getBeneficiaryContribution());
+            task.setGrandTotalRemaining(taskCreationRequest.getGrantAmount());
             task.setActivity(mActivity);
             mTaskRepository.save(task);
             return "SUCCESS";
@@ -198,6 +200,7 @@ public class BeneficiaryService {
             mTask.setBalanceRemaining(bRequest.getTotalCost());
             mTask.setUnitRemain(bRequest.getUnits());
             mTask.setBeneficiaryContribution(bRequest.getBeneficiaryContribution());
+            mTask.setBeneficiaryContributionRemain(bRequest.getBeneficiaryContribution());
             mTask.setGrantAmount(bRequest.getGrantAmount());
             mTask.setYearOfSanction(bRequest.getYearOfSanction());
             mTask.setActivity(mActivity);
@@ -267,7 +270,7 @@ public class BeneficiaryService {
     }
 
     private boolean checkInvalidDataLimit(TaskUpdateDTO taskUpdateDTO, M_Task mTask) {
-        if (mTask.getUnits() - taskUpdateDTO.getAchievementUnit() >= 0) {
+        if (mTask.getUnitRemain() - taskUpdateDTO.getAchievementUnit() >= 0 && mTask.getBeneficiaryContributionRemain() - taskUpdateDTO.getBenContribution() >= 0) {
             mTask.setUnitRemain(mTask.getUnits() - taskUpdateDTO.getAchievementUnit());
             mTask.setBalanceRemaining(mTask.getTotalCost() - (taskUpdateDTO.getAchievementUnit() * mTask.getRatePerUnit()));
             mTaskRepository.save(mTask);
