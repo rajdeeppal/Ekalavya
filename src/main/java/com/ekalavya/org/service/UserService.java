@@ -38,6 +38,10 @@ public class UserService {
 		return userRepository.save(user);
 	}
 
+	public User updateUser(User user){
+		return userRepository.save(user);
+	}
+
 	public User findByUsername(String username) {
 		Optional<User> user = userRepository.findByUsername(username);
 		if(user.isPresent()) {

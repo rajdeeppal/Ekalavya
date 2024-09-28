@@ -2,6 +2,7 @@ package com.ekalavya.org.service;
 
 import com.ekalavya.org.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,8 +20,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         com.ekalavya.org.entity.User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));;
-
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        if (!"Y".equals(user.getIsActive())) {
+            throw new BadCredentialsException("User is not active yet.");
+        }
         return new User(user.getUsername(), user.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority(user.getRole().getName())));
     }

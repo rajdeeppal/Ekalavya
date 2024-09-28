@@ -14,6 +14,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+
 @Slf4j
 @RestController
 @RequestMapping("/auth")
@@ -50,7 +52,7 @@ public class AuthenticationController {
 
         } catch (AuthenticationException e) {
             log.error(e.getMessage());
-            return ResponseEntity.status(401).body("Invalid username or password");
+            return ResponseEntity.status(401).body(e.getMessage());
         }
     }
 

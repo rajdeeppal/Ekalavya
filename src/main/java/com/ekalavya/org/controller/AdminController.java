@@ -116,7 +116,7 @@ public class AdminController {
             user.setIsActive("Y");
             emailService.sendApprovalEmail(user);
             userService.assignRole(user, request.getRequestedRole());
-            userService.save(user);
+            userService.updateUser(user);
             roleAuditService.logRoleChange("ASSIGNED", user, role, "Admin");
             return ResponseEntity.status(HttpStatus.OK).body("Role Request Approved!!!");
         }
