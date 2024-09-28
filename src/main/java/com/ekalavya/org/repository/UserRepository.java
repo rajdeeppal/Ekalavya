@@ -12,7 +12,12 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>{
+
 	Optional<User> findByUsername(String username);
+
+	@Query("SELECT u FROM User u WHERE u.empId = :empId")
+	Optional<User> findByEmployeeId(@Param("empId") Long empId);
+
 	List<User> findByRole(Role role);
 
 	@Query("SELECT u FROM User u WHERE u.role IS NULL")
