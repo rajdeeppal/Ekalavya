@@ -3,6 +3,8 @@ package com.ekalavya.org.DTO;
 import lombok.Data;
 
 @Data
-public class AdminLoginRequest {
+public class ValidateOtpRequest {
+
     private String username;
+    private String otp;
 }

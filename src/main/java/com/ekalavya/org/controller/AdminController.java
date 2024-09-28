@@ -1,7 +1,9 @@
 package com.ekalavya.org.controller;
 
+import com.ekalavya.org.DTO.AdminLoginRequest;
 import com.ekalavya.org.DTO.ProjectConfigurationDTO;
 import com.ekalavya.org.DTO.TaskDTO;
+import com.ekalavya.org.DTO.ValidateOtpRequest;
 import com.ekalavya.org.entity.*;
 import com.ekalavya.org.service.*;
 import freemarker.template.TemplateException;
@@ -10,12 +12,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+
+import static com.ekalavya.org.service.OtpService.getValidMaskedEmail;
 
 @RestController
 @Slf4j
@@ -60,41 +65,34 @@ public class AdminController {
 //        return "admin/login";
 //    }
 
-//    @PostMapping("/sendOtp")
-//    public String sendOtp(@ModelAttribute AdminLoginRequest adminLoginRequest, Model model,
-//                          HttpServletRequest request, HttpServletResponse response) {
-//        log.info("inside sendotp()");
-//        boolean isUserAdmin = otpService.validateAdmin(adminLoginRequest.getUsername());
-//        if (isUserAdmin) {
-//            String otpEmail = otpService.generateAndSendOtp(adminLoginRequest.getUsername());
-//            if (otpEmail != null) {
-//                String maskEmail = getValidMaskedEmail(otpEmail);
+    @PostMapping("/sendOtp")
+    public ResponseEntity<?> sendOtp(@RequestBody AdminLoginRequest adminLoginRequest) {
+        log.info("inside sendotp()");
+        boolean isUserAdmin = otpService.validateAdmin(adminLoginRequest.getUsername());
+        if (isUserAdmin) {
+            String otpEmail = otpService.generateAndSendOtp(adminLoginRequest.getUsername());
+            if (otpEmail != null) {
+                String maskEmail = getValidMaskedEmail(otpEmail);
 //                model.addAttribute("username", adminLoginRequest.getUsername());
 //                model.addAttribute("otpSent", true);
 //                model.addAttribute("message", "OTP send to: " + maskEmail);
-//                return "admin/login";
-//            } else {
-//                model.addAttribute("error", "Failed to send OTP. Please try again.");
-//                return "admin/login";
-//            }
-//        } else {
-//            model.addAttribute("error", "Invalid Admin Credential. Please try again.");
-//            return "admin/login";
-//        }
-//    }
+                return ResponseEntity.status(HttpStatus.CREATED).body("Otp Created");
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User Email is Null");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User is not a Admin User");
+        }
+    }
 
-//    @PostMapping("/validateOtp")
-//    public String validateOtp(@ModelAttribute("username") String username, @ModelAttribute("otp") String otp, Model model) {
-//        if (otpService.validateOtp(username, otp)) {
-//            //return "redirect:/admin/manageRoles";
-//            return "redirect:/admins/home";
-//        } else {
-//            model.addAttribute("username", username);
-//            model.addAttribute("error", "Invalid OTP or OTP expired");
-//            model.addAttribute("otpSent", true);
-//            return "redirect:/admins/home";
-//        }
-//    }
+    @PostMapping("/validateOtp")
+    public ResponseEntity<?> validateOtp(@RequestBody ValidateOtpRequest validateOtpRequest) {
+        if (otpService.validateOtp(validateOtpRequest.getUsername(), validateOtpRequest.getOtp())) {
+            return ResponseEntity.status(HttpStatus.OK).body("Otp Validated Successfully!");
+        } else {
+            return ResponseEntity.status(HttpStatus.OK).body("Otp Validation Fsiled!!");
+        }
+    }
 
 //    @GetMapping("/logout")
 //    public String showAdminLogoutPage(HttpServletRequest request, HttpServletResponse response) {

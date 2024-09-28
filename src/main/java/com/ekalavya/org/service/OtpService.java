@@ -5,6 +5,7 @@ import com.ekalavya.org.entity.Role;
 import com.ekalavya.org.entity.User;
 import com.ekalavya.org.repository.OtpRepository;
 import com.ekalavya.org.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import java.util.Random;
 
 @Service
+@Slf4j
 public class OtpService {
 
     @Autowired
@@ -50,12 +52,15 @@ public class OtpService {
     }
 
     public boolean validateOtp(String username, String otp) {
+        log.info("Entered into Otp Validation with OTP : {}", otp);
         OtpDetails otpDetails = otpRepository.findByUsername(username);
         LocalDateTime otpTimestamp = otpDetails.getOtpTimestamp();
         if (otpDetails.getOtp().equals(otp) && otpTimestamp.isAfter(LocalDateTime.now().minusMinutes(10)) && !otpDetails.isAlreadyValidated()) {
             otpDetails.setAlreadyValidated(true);
+            log.info("Otp valaidated successfully!!");
             return true;
         }
+        log.info("Otp is expired. PLease login again !! ");
         return false;
     }
 
@@ -63,7 +68,7 @@ public class OtpService {
         Optional<User> userObject = userRepository.findByUsername(username);
         if (userObject.isPresent()) {
             Role userRole  = userObject.get().getRole();
-            return "SPWAdmin".equals(userRole.getName());
+            return "EADMIN".equals(userRole.getName());
         }
         return false;
     }
