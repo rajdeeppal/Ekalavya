@@ -35,6 +35,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/self-service/**").permitAll()
+                        .requestMatchers("/user/**").permitAll()
+                        .requestMatchers("/admin/sendOtp", "/admin/validateOtp").permitAll()
                         .requestMatchers("/beneficiary/**").permitAll() //TODO:  to be removed later once, login ui is implemented
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
                         .anyRequest().authenticated()
