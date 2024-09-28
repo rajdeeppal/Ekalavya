@@ -84,24 +84,29 @@ public class RoleAuditController {
 			}
 			return null;
 	    }
-//
-//
-//	    @PostMapping("/changeRole")
-//	    public String changeRole(@RequestParam("userId") Long userId, @RequestParam("newRoleId") Long newRoleId, Model model) {
-//	        User user = userRepository.findById(userId).orElse(null);
-//	        Role newRole = roleRepository.findById(newRoleId).orElse(null);
-//
-//	        if (user != null && newRole != null) {
-//	        	RoleAudit roleAudit = roleAuditRepository.findByUser(user);
-//	            user.setRole(newRole);
-//	            userRepository.save(user);
-//
-//	           if(roleAudit != null ) {
-//	        	   roleAudit.setRole(newRole);
-//	        	   roleAudit.setAction("ASSIGNED");
-//	        	   roleAuditRepository.save(roleAudit);
-//	            }
-//	        }
-//	        return "redirect:/admin/roleAudit?searchRole=" + newRole.getName();
-//	    }
+
+
+	    @PostMapping("/changeRole")
+	    public ResponseEntity<?> changeRole(@RequestParam("userId") Long userId, @RequestParam("newRoleId") Long newRoleId, Model model) {
+	        try{
+				User user = userRepository.findById(userId).orElse(null);
+				Role newRole = roleRepository.findById(newRoleId).orElse(null);
+
+				if (user != null && newRole != null) {
+					RoleAudit roleAudit = roleAuditRepository.findByUser(user);
+					user.setRole(newRole);
+					userRepository.save(user);
+
+					if(roleAudit != null ) {
+						roleAudit.setRole(newRole);
+						roleAudit.setAction("ASSIGNED");
+						roleAuditRepository.save(roleAudit);
+					}
+				}
+				return ResponseEntity.ok().body("Role Successfully Reassigned");
+			}catch (Exception e) {
+				log.info("Exception occurred : {}", e.getMessage());
+				return ResponseEntity.ok().body(e.getMessage());
+			}
+	    }
 }
