@@ -125,7 +125,7 @@ public class AdminController {
 
     @PostMapping("/rejectRoleRequest")
     public ResponseEntity<?> rejectRoleRequest(@RequestBody RejectRequestPayload rejectRequestPayload) {
-        RoleRequest request = roleRequestService.rejectRequest(rejectRequestPayload.getRequestId(), rejectRequestPayload.getRejectionComments());
+        RoleRequest request = roleRequestService.rejectRequest(rejectRequestPayload.getRequestId(), rejectRequestPayload.getApproverComments());
         User user = request.getUser();
         if(user != null){
             roleRequestService.deleteRoleRequestById(request.getId());

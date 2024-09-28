@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class RejectRequestPayload {
     private Long requestId;
-    private String rejectionComments;
+    private String approverComments;
 }
