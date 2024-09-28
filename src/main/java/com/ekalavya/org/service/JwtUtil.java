@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class JwtUtil {
 
     private final SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private static final long EXPIRATION_TIME_MS = 5 * 60 * 1000;
+    private static final long EXPIRATION_TIME_MS = 60 * 60 * 1000;
 
     public String generateToken(UserDetails userDetails) {
 
