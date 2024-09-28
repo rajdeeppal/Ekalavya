@@ -1,9 +1,6 @@
 package com.ekalavya.org.controller;
 
-import com.ekalavya.org.DTO.AdminLoginRequest;
-import com.ekalavya.org.DTO.ProjectConfigurationDTO;
-import com.ekalavya.org.DTO.TaskDTO;
-import com.ekalavya.org.DTO.ValidateOtpRequest;
+import com.ekalavya.org.DTO.*;
 import com.ekalavya.org.entity.*;
 import com.ekalavya.org.service.*;
 import freemarker.template.TemplateException;
@@ -111,8 +108,8 @@ public class AdminController {
     }
 
     @PostMapping("/approveRoleRequest")
-    public String approveRoleRequest(@RequestParam("requestId") Long requestId, @RequestParam("approverComments") String approverComments) throws MessagingException, TemplateException, IOException {
-        RoleRequest request = roleRequestService.approveRequest(requestId, approverComments);
+    public ResponseEntity<?> approveRoleRequest(@RequestBody ApproveRequestPayload approveRequestPayload) throws MessagingException, TemplateException, IOException {
+        RoleRequest request = roleRequestService.approveRequest(approveRequestPayload.getRequestId(), approveRequestPayload.getApproverComments());
         User user = request.getUser();
         Role role = roleService.getRoleByRolename(request.getRequestedRole());
         if (role != null && user != null) {
@@ -121,18 +118,21 @@ public class AdminController {
             userService.assignRole(user, request.getRequestedRole());
             userService.save(user);
             roleAuditService.logRoleChange("ASSIGNED", user, role, "Admin");
+            return ResponseEntity.status(HttpStatus.OK).body("Role Request Approved!!!");
         }
-        return "redirect:/admin/manageRoles";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Provide proper role and user !!!");
     }
 
     @PostMapping("/rejectRoleRequest")
-    public String rejectRoleRequest(@RequestParam("requestId") Long requestId, @RequestParam("rejectionComments") String rejectionComments) {
-        RoleRequest request = roleRequestService.rejectRequest(requestId, rejectionComments);
+    public ResponseEntity<?> rejectRoleRequest(@RequestBody RejectRequestPayload rejectRequestPayload) {
+        RoleRequest request = roleRequestService.rejectRequest(rejectRequestPayload.getRequestId(), rejectRequestPayload.getRejectionComments());
         User user = request.getUser();
         if(user != null){
+            roleRequestService.deleteRoleRequestById(request.getId());
             userService.removeUserById(user.getId());
+            return ResponseEntity.status(HttpStatus.OK).body("Role Request Rejected!!!");
         }
-        return "redirect:/admin/manageRoles";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Provide proper role and user !!!");
     }
 
     @GetMapping("/verticals")

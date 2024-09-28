@@ -2,6 +2,7 @@ package com.ekalavya.org.service;
 
 import java.util.Optional;
 
+import com.ekalavya.org.repository.RoleRequestRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class UserService {
     @Autowired
     private UserDetailsService userDetailsService;
 
+	@Autowired
+	private RoleRequestRepository roleRequestRepository;
+
     private static final Logger logger = LoggerFactory.getLogger(RoleAuditService.class);
 
 	public User save(User user) {
@@ -46,8 +50,10 @@ public class UserService {
 		Optional<User> users = userRepository.findById(user.getId());
 		if(users.isPresent() && rolename.equals(user.getRole().getName())) {
 			 logger.info("Ask Role is given to userId: {}, username: {}", user.getId(), user.getUsername());
+		}else{
+			logger.info("Missmatch in Role for userId: {}, username: {}", user.getId(), user.getUsername());
 		}
-		logger.info("Missmatch in Role for userId: {}, username: {}", user.getId(), user.getUsername());
+
 	}
 
 	public User findById(String id) {

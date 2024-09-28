@@ -48,6 +48,10 @@ public class RoleRequestService {
         return roleRequestRepository.save(request);
     }
 
+    public void deleteRoleRequestById(Long roleRequestId){
+        roleRequestRepository.deleteById(roleRequestId);
+    }
+
     public RoleRequest rejectRequest(Long requestId, String approverComments) {
         RoleRequest request = roleRequestRepository.findById(requestId).orElseThrow(() -> new RuntimeException("Request not found"));
         request.setStatus("REJECTED");
