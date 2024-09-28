@@ -1,6 +1,7 @@
 package com.ekalavya.org.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.ekalavya.org.service.RoleService;
 import lombok.extern.slf4j.Slf4j;
@@ -45,8 +46,8 @@ public class RoleAuditController {
 	    public ResponseEntity<?> auditRole(@PathVariable String roleName) {
 			List<User> users = null;
 	    	if(!"UNASSIGN".equals(roleName)) {
-				Role role = roleRepository.findByName(roleName);
-				users = userRepository.findApprovedUsersWithSpecificRole(role, "APPROVED");
+				Optional<Role> role = roleRepository.findByName(roleName);
+				users = userRepository.findApprovedUsersWithSpecificRole(role.get(), "APPROVED");
 				List<Role> allRoles = roleService.getAllRoles();
 	    	}
 	    	else {
@@ -87,10 +88,10 @@ public class RoleAuditController {
 
 
 	    @PostMapping("/changeRole")
-	    public ResponseEntity<?> changeRole(@RequestParam("userId") Long userId, @RequestParam("newRoleId") Long newRoleId, Model model) {
+	    public ResponseEntity<?> changeRole(@RequestParam("userId") Long userId, @RequestParam("newRoleName") String roleName) {
 	        try{
 				User user = userRepository.findById(userId).orElse(null);
-				Role newRole = roleRepository.findById(newRoleId).orElse(null);
+				Role newRole = roleRepository.findByName(roleName).orElse(null);
 
 				if (user != null && newRole != null) {
 					RoleAudit roleAudit = roleAuditRepository.findByUser(user);

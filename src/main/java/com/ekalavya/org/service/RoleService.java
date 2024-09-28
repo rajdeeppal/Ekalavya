@@ -11,6 +11,8 @@ import com.ekalavya.org.entity.Role;
 import com.ekalavya.org.entity.User;
 import com.ekalavya.org.repository.RoleRepository;
 
+import javax.swing.text.html.Option;
+
 @Service
 public class RoleService {
 
@@ -18,9 +20,9 @@ public class RoleService {
 	RoleRepository roleRepository;
 	
 	public Role getRoleByRolename(String rolename) {
-		Role role = roleRepository.findByName(rolename);
-		if(role != null) {
-			return role;
+		Optional<Role> role = roleRepository.findByName(rolename);
+		if(role.isPresent()) {
+			return role.get();
 		}
 		return null;
 	}
