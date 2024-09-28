@@ -14,7 +14,9 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long>{
 	Optional<User> findByUsername(String username);
 	List<User> findByRole(Role role);
-	List<User> findByRoleIsNull();
+
+	@Query("SELECT u FROM User u WHERE u.isActive = 'N'")
+	List<User> findByIsActiveN();
 	
 	@Query("SELECT u FROM User u JOIN RoleRequest rr ON rr.user = u WHERE u.role = :role AND rr.status = :status")
     List<User> findApprovedUsersWithSpecificRole(@Param("role") Role role, @Param("status") String status);

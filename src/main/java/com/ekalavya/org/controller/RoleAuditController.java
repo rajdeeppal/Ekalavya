@@ -49,7 +49,7 @@ public class RoleAuditController {
 	    	else {
 	    		Role role = new Role();
 	    		role.setName("UNASSIGN");
-	    		users = userRepository.findByRoleIsNull();
+	    		users = userRepository.findByIsActiveN();
 	    		List<Role> allRoles = roleRepository.findAll();
 	    	}
 			return ResponseEntity.status(HttpStatus.OK).body(users);
