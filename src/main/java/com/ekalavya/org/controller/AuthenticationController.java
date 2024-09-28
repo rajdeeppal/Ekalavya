@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/auth")
+
 public class AuthenticationController {
 
     @Autowired
@@ -42,6 +43,7 @@ public class AuthenticationController {
             String jwt = jwtUtil.generateToken(userDetails);
 
             log.info("Logged in user : {}", userDetails.getUsername());
+            log.info("JWT Token genenerated : {}", jwt);
 
             // Return the JWT in the response
             return ResponseEntity.ok(new AuthResponse(jwt));
