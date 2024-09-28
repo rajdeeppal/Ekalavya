@@ -19,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        com.ekalavya.org.entity.User user = userRepository.findByEmployeeId(Long.valueOf(username))
+        com.ekalavya.org.entity.User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         if (!"Y".equals(user.getIsActive())) {
             throw new BadCredentialsException("User is not active yet.");
