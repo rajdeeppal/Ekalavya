@@ -8,5 +8,4 @@ import lombok.Setter;
 public class ProjectDTO {
     private String projectName;
     private String verticalName;
-    private String userId;
 }

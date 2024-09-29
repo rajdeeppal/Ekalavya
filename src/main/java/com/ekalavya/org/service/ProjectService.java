@@ -35,8 +35,8 @@ public class ProjectService {
         return projectRepository.findAll();
     }
 
-    public Project addProject(ProjectDTO projectDTO){
-        User user = userService.findByEmplId(projectDTO.getUserId());
+    public Project addProject(String employeeId, ProjectDTO projectDTO){
+        User user = userService.findByEmplId(employeeId);
         Vertical vertical = verticalService.findByName(projectDTO.getVerticalName());
         Project project = new Project();
         project.setProjectName(projectDTO.getProjectName());

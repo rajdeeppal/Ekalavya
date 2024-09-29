@@ -37,10 +37,10 @@ public class UsersController {
         return "user/home";  // Renders the user home page (user/home.html)
     }
 
-    @PostMapping("/pm/project/save")
-    public ResponseEntity<?> addProject(@RequestBody ProjectDTO projectDTO){
+    @PostMapping("/pm/project/save/{userId}")
+    public ResponseEntity<?> addProject(@PathVariable String userId, @RequestBody ProjectDTO projectDTO){
         try {
-            Project project = projectService.addProject(projectDTO);
+            Project project = projectService.addProject(userId, projectDTO);
             return ResponseEntity.ok(project);
         } catch (Exception e){
             logger.error("Error creating project", e);
