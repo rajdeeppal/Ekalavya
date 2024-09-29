@@ -23,7 +23,7 @@ public class ProjectService {
     private VerticalService verticalService;
 
     public List<Project> getInprogressProjectsByUserId(String userId) {
-        User user = userService.findById(userId);
+        User user = userService.findByEmplId(userId);
         return projectRepository.findActiveProjectByUser(user);
     }
 
@@ -36,7 +36,7 @@ public class ProjectService {
     }
 
     public Project addProject(ProjectDTO projectDTO){
-        User user = userService.findById(projectDTO.getUserId());
+        User user = userService.findByEmplId(projectDTO.getUserId());
         Vertical vertical = verticalService.findByName(projectDTO.getVerticalName());
         Project project = new Project();
         project.setProjectName(projectDTO.getProjectName());

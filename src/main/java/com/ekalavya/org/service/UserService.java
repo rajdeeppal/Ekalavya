@@ -60,11 +60,12 @@ public class UserService {
 
 	}
 
-	public User findById(String id) {
-		Optional<User> user = userRepository.findById(Long.parseLong(id));
+	public User findByEmplId(String id) {
+		Optional<User> user = userRepository.findByEmployeeId(Long.parseLong(id));
 		if(user.isPresent()) {
 			return user.get();
 		}
+		logger.info("Not a active user !! ");
 		return new User();
 	}
 
