@@ -33,7 +33,7 @@ public class OtpService {
     public String generateAndSendOtp(String username) {
         String otp = String.valueOf(new Random().nextInt(999999));
 
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<User> user = userRepository.findByEmployeeId(Long.parseLong(username));
 
         OtpDetails otpDbObject = new OtpDetails();
         otpDbObject.setUsername(username);
@@ -65,7 +65,7 @@ public class OtpService {
     }
 
     public boolean validateAdmin(String username) {
-        Optional<User> userObject = userRepository.findByUsername(username);
+        Optional<User> userObject = userRepository.findByEmployeeId(Long.parseLong(username));
         if (userObject.isPresent()) {
             Role userRole  = userObject.get().getRole();
             return "EADMIN".equals(userRole.getName());
