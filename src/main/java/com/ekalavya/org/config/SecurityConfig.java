@@ -39,7 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/self-service/**").permitAll()
                         .requestMatchers("/admin/sendOtp", "/admin/validateOtp").permitAll()
-                        .requestMatchers("/beneficiary/**").permitAll() //TODO:  to be removed later once, login ui is implemented
+                        .requestMatchers("/roleAudit").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
                         .anyRequest().authenticated()
                 )
