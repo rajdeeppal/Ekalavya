@@ -24,7 +24,7 @@ public class M_Activity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    private String name;
+    private String activityName;
 
     @ManyToOne
     @JsonBackReference

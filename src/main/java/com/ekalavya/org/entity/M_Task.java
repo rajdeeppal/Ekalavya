@@ -23,7 +23,7 @@ public class M_Task {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    private String name;
+    private String taskName;
     private String typeOfUnit;
     private int units;
     private Long ratePerUnit;
@@ -34,7 +34,6 @@ public class M_Task {
     private int unitRemain;
     private Long balanceRemaining;
     private int beneficiaryContributionRemain;
-    private Long grandTotalRemaining;
     private String isCompleted;
 
 /*    while viewing task (update/ edit/add) task update populate unitRemain, balanceRemaining, beneficiaryContributionRemain, grandTotalRemaining

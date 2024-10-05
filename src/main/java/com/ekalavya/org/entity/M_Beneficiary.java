@@ -21,7 +21,7 @@ public class M_Beneficiary {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    private String name;
+    private String beneficiaryName;
     private String guardianName;
 //    @Embedded
 //    private AddressDetails addressDetails;
@@ -45,6 +45,8 @@ public class M_Beneficiary {
     private Set<M_Component> components = new HashSet<>();
 
     private String terminate;
+
+    private boolean isSanction = false;
 
     public M_Beneficiary(){
         this.terminate = "N";

@@ -1,9 +1,6 @@
 package com.ekalavya.org.controller;
 
-import com.ekalavya.org.DTO.BeneficiaryCreationRequest;
-import com.ekalavya.org.DTO.BeneficiaryResponse;
-import com.ekalavya.org.DTO.TaskCreationRequest;
-import com.ekalavya.org.DTO.TaskUpdateDTO;
+import com.ekalavya.org.DTO.*;
 import com.ekalavya.org.service.BeneficiaryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -42,7 +40,7 @@ public class BeneficiaryController {
         if ("SUCCESS".equals(beneficiaryService.addTask(activity, taskCreationRequest))) {
             return new ResponseEntity<>(HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(HttpStatus.BAD_GATEWAY);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @PutMapping("/addTask/{taskId}")
@@ -65,19 +63,35 @@ public class BeneficiaryController {
     }
 
     @PostMapping("/addTaskUpdate/{taskId}")
-    public ResponseEntity<String> addTaskUpdate(@PathVariable("taskId") long taskId, @ModelAttribute TaskUpdateDTO taskUpdateDTO) throws IOException {
-        if ("SUCCESS".equals(beneficiaryService.addTaskUpdate(taskId, taskUpdateDTO))) {
+    public ResponseEntity<String> addTaskUpdate(@PathVariable("taskId") long taskId,
+                                                @RequestParam("passbook") MultipartFile passbookDoc,
+                                                @RequestParam("otherDoc") List<MultipartFile> otherDocs,
+                                                @RequestBody TaskUpdateDTO taskUpdateDTO) throws IOException {
+        if ("SUCCESS".equals(beneficiaryService.addTaskUpdate(taskId, taskUpdateDTO, passbookDoc, otherDocs))) {
             return new ResponseEntity<>(HttpStatus.CREATED);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @PutMapping("/addTaskUpdate/{taskUpdateId}")
-    public ResponseEntity<String> updateTaskUpdate(@PathVariable("taskUpdateId") long taskUpdateId, @ModelAttribute TaskUpdateDTO taskUpdateDTO) throws IOException {
-        if ("SUCCESS".equals(beneficiaryService.updateTaskUpdate(taskUpdateId, taskUpdateDTO))) {
+    public ResponseEntity<String> updateTaskUpdate(@PathVariable("taskUpdateId") long taskUpdateId,
+                                                   @RequestParam("passbook") MultipartFile passbookDoc,
+                                                   @RequestParam("otherDoc") List<MultipartFile> otherDocs,
+                                                   @RequestBody TaskUpdateDTO taskUpdateDTO) throws IOException {
+        if ("SUCCESS".equals(beneficiaryService.updateTaskUpdate(taskUpdateId, taskUpdateDTO, passbookDoc, otherDocs))) {
             return new ResponseEntity<>(HttpStatus.CREATED);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @PostMapping("/resolution/upload/{userId}")
+    public ResponseEntity<String> uploadResolutionDocs(@PathVariable String userId,
+                                                       @RequestParam("file") MultipartFile resolutionDoc,
+                                                       @RequestBody ResolutionTaskDTO resolutionTaskDTO) throws IOException {
+        if ("SUCCESS".equals(beneficiaryService.uploadResolutionDocs(userId, resolutionDoc, resolutionTaskDTO))){
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
 }

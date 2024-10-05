@@ -27,7 +27,7 @@ public class M_Component {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    private String name;
+    private String componentName;
 
     @ManyToOne
     @JsonBackReference

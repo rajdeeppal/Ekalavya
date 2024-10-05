@@ -11,6 +11,6 @@ public interface MTaskRepository extends JpaRepository<M_Task, Long> {
     M_Task findById(long id);
     M_Task findByNameAndActivity(String name, M_Activity mActivity);
 
-    @Query("SELECT mtask FROM M_Task mtask WHERE mtask.isCompleted = 'N'")
+    @Query("SELECT mtask FROM M_Task mtask WHERE mtask.isCompleted = 'N' AND mtask.unitRemain = 0")
     Page<M_Task> findIncompleteTasks(Pageable pageable);
 }

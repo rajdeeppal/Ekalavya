@@ -1,9 +1,6 @@
 package com.ekalavya.org.service;
 
-import com.ekalavya.org.DTO.BeneficiaryCreationRequest;
-import com.ekalavya.org.DTO.BeneficiaryResponse;
-import com.ekalavya.org.DTO.TaskCreationRequest;
-import com.ekalavya.org.DTO.TaskUpdateDTO;
+import com.ekalavya.org.DTO.*;
 import com.ekalavya.org.entity.*;
 import com.ekalavya.org.exception.CustomException;
 import com.ekalavya.org.repository.*;
@@ -12,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -49,6 +47,9 @@ public class BeneficiaryService {
     @Autowired
     private MTaskUpdateRepository mTaskUpdateRepository;
 
+    @Autowired
+    private ResolutionTaskService resolutionTaskService;
+
     @Transactional
     public String addBeneficiary(BeneficiaryCreationRequest bRequest) {
         M_Beneficiary beneficiary = null;
@@ -58,7 +59,7 @@ public class BeneficiaryService {
             if (checkAdmision) {
                 M_Beneficiary beneficiaryRepositoryByAadharNumber = beneficiaryRepository.
                         findByAadharAndProjectAndProjectTermination(project, bRequest.getAadharNumber());
-                if (beneficiaryRepositoryByAadharNumber != null && bRequest.getBeneficiaryName().equals(beneficiaryRepositoryByAadharNumber.getName())) {
+                if (beneficiaryRepositoryByAadharNumber != null && bRequest.getBeneficiaryName().equals(beneficiaryRepositoryByAadharNumber.getBeneficiaryName())) {
                     beneficiary = parseRequestAndCreateDbObject(beneficiaryRepositoryByAadharNumber, bRequest, project);
                 } else if (beneficiaryRepositoryByAadharNumber != null) {
                     throw new CustomException("Error: Duplicate Aadhar number is not permitted !! ");
@@ -131,7 +132,7 @@ public class BeneficiaryService {
         try {
             M_Activity mActivity = mActivityRepository.findById(activityId);
             M_Task task = new M_Task();
-            task.setName(taskCreationRequest.getName());
+            task.setTaskName(taskCreationRequest.getName());
             task.setTypeOfUnit(taskCreationRequest.getTypeOfUnit());
             task.setUnits(taskCreationRequest.getUnits());
             task.setRatePerUnit(taskCreationRequest.getRatePerUnit());
@@ -142,7 +143,6 @@ public class BeneficiaryService {
             task.setBalanceRemaining(taskCreationRequest.getTotalCost());
             task.setUnitRemain(taskCreationRequest.getUnits());
             task.setBeneficiaryContributionRemain(taskCreationRequest.getBeneficiaryContribution());
-            task.setGrandTotalRemaining(taskCreationRequest.getGrantAmount());
             task.setActivity(mActivity);
             mTaskRepository.save(task);
             return "SUCCESS";
@@ -159,7 +159,7 @@ public class BeneficiaryService {
 
         if (beneficiary == null) {
             beneficiary = new M_Beneficiary();
-            beneficiary.setName(bRequest.getBeneficiaryName());
+            beneficiary.setBeneficiaryName(bRequest.getBeneficiaryName());
             beneficiary.setGuardianName(bRequest.getGuardianName());
             beneficiary.setProject(project);
             beneficiary.setVillageName(bRequest.getVillageName());
@@ -174,7 +174,7 @@ public class BeneficiaryService {
         M_Component mComponent = mComponentRepository.findByNameAndBeneficiary(bRequest.getComponentName(), beneficiary);
         if (mComponent == null) {
             mComponent = new M_Component();
-            mComponent.setName(bRequest.getComponentName());
+            mComponent.setComponentName(bRequest.getComponentName());
             mComponent.setBeneficiary(beneficiary);
             mComponentRepository.save(mComponent);
         }
@@ -183,7 +183,7 @@ public class BeneficiaryService {
         M_Activity mActivity = mActivityRepository.findByNameAndComponent(bRequest.getActivityName(), mComponent);
         if (mActivity == null) {
             mActivity = new M_Activity();
-            mActivity.setName(bRequest.getActivityName());
+            mActivity.setActivityName(bRequest.getActivityName());
             mActivity.setComponent(mComponent);
             mActivityRepository.save(mActivity);
         }
@@ -192,12 +192,12 @@ public class BeneficiaryService {
         // create the task entity
         if (mTask == null) {
             mTask = new M_Task();
-            mTask.setName(bRequest.getTaskName());
+            mTask.setTaskName(bRequest.getTaskName());
             mTask.setTypeOfUnit(bRequest.getTypeOfUnit());
             mTask.setUnits(bRequest.getUnits());
             mTask.setRatePerUnit(bRequest.getRatePerUnit());
             mTask.setTotalCost(bRequest.getTotalCost());
-            mTask.setBalanceRemaining(bRequest.getTotalCost());
+            mTask.setBalanceRemaining(bRequest.getGrantAmount());
             mTask.setUnitRemain(bRequest.getUnits());
             mTask.setBeneficiaryContribution(bRequest.getBeneficiaryContribution());
             mTask.setBeneficiaryContributionRemain(bRequest.getBeneficiaryContribution());
@@ -213,19 +213,19 @@ public class BeneficiaryService {
     public String updateTask(long taskId, TaskCreationRequest taskCreationRequest) {
         try {
             M_Task task = mTaskRepository.findById(taskId);
-            task.setName(taskCreationRequest.getName());
-            task.setTypeOfUnit(taskCreationRequest.getTypeOfUnit());
-            task.setUnits(taskCreationRequest.getUnits());
-            task.setRatePerUnit(taskCreationRequest.getRatePerUnit());
-            task.setTotalCost(taskCreationRequest.getTotalCost());
-            task.setBeneficiaryContribution(taskCreationRequest.getBeneficiaryContribution());
-            task.setGrantAmount(taskCreationRequest.getGrantAmount());
-            task.setYearOfSanction(taskCreationRequest.getYearOfSanction());
-            if(taskCreationRequest.getTotalCost() != null ){
-                task.setBalanceRemaining(taskCreationRequest.getTotalCost());
-            }
-            if( taskCreationRequest.getUnits() > 0 ){
+            if(taskCreationRequest.getUnits() != 0 || taskCreationRequest.getBeneficiaryContribution() != 0){
+                task.setUnits(taskCreationRequest.getUnits());
                 task.setUnitRemain(taskCreationRequest.getUnits());
+                task.setTotalCost(taskCreationRequest.getTotalCost());
+                if(taskCreationRequest.getBeneficiaryContribution() != 0){
+                    task.setBeneficiaryContribution(taskCreationRequest.getBeneficiaryContribution());
+                    task.setBeneficiaryContributionRemain(taskCreationRequest.getBeneficiaryContribution());
+                }
+                task.setGrantAmount(taskCreationRequest.getGrantAmount());
+                task.setBalanceRemaining(taskCreationRequest.getGrantAmount());
+            }
+            if(taskCreationRequest.getYearOfSanction() != 0 ){
+                task.setYearOfSanction(taskCreationRequest.getYearOfSanction());
             }
             mTaskRepository.save(task);
             return "SUCCESS";
@@ -235,13 +235,13 @@ public class BeneficiaryService {
         }
     }
 
-    public String addTaskUpdate(long taskId, TaskUpdateDTO taskUpdateDTO) throws IOException {
+    public String addTaskUpdate(long taskId, TaskUpdateDTO taskUpdateDTO, MultipartFile passbook, List<MultipartFile> otherDocs) throws IOException {
         try {
             M_Task mTask = mTaskRepository.findById(taskId);
 
-            Document passbookDoc = documentStorageService.storeFile(taskUpdateDTO.getPassbookDoc());
+            Document passbookDoc = documentStorageService.storeFile(passbook);
 
-            List<Document> otherDocuments = taskUpdateDTO.getOtherDocs().stream()
+            List<Document> otherDocuments = otherDocs.stream()
                     .map(file -> {
                         try {
                             return documentStorageService.storeFile(file);
@@ -270,16 +270,43 @@ public class BeneficiaryService {
     }
 
     private boolean checkInvalidDataLimit(TaskUpdateDTO taskUpdateDTO, M_Task mTask) {
-        if (mTask.getUnitRemain() - taskUpdateDTO.getAchievementUnit() >= 0 && mTask.getBeneficiaryContributionRemain() - taskUpdateDTO.getBenContribution() >= 0) {
-            mTask.setUnitRemain(mTask.getUnits() - taskUpdateDTO.getAchievementUnit());
-            mTask.setBalanceRemaining(mTask.getTotalCost() - (taskUpdateDTO.getAchievementUnit() * mTask.getRatePerUnit()));
+        if(taskUpdateDTO.getAchievementUnit() != 0 && taskUpdateDTO.getBenContribution() != 0){
+            if (mTask.getUnitRemain() - taskUpdateDTO.getAchievementUnit() >= 0 && mTask.getBeneficiaryContributionRemain() - taskUpdateDTO.getBenContribution() >= 0) {
+                Long balance = mTask.getBalanceRemaining() - (taskUpdateDTO.getAchievementUnit() * mTask.getRatePerUnit()) + taskUpdateDTO.getBenContribution();
+                if(balance >= 0 ){
+                    mTask.setUnitRemain(mTask.getUnitRemain() - taskUpdateDTO.getAchievementUnit());
+                    mTask.setBalanceRemaining(balance);
+                    mTask.setBeneficiaryContributionRemain(mTask.getBeneficiaryContributionRemain() - taskUpdateDTO.getBenContribution());
+                    mTaskRepository.save(mTask);
+                    return false;
+                }
+                log.error("Error: Sanction amount already consumed !! Add beneficiary contribution amount !! ");
+                return true;
+            }
+            log.error("Error: Invalid Data combinations !! ");
+            return true;
+        }
+        if (taskUpdateDTO.getAchievementUnit() != 0 && (mTask.getUnitRemain() - taskUpdateDTO.getAchievementUnit() >= 0) ) {
+            Long balance = mTask.getBalanceRemaining() - (taskUpdateDTO.getAchievementUnit() * mTask.getRatePerUnit());
+            if(balance >= 0 ){
+                mTask.setUnitRemain(mTask.getUnitRemain() - taskUpdateDTO.getAchievementUnit());
+                mTask.setBalanceRemaining(balance);
+                mTaskRepository.save(mTask);
+                return false;
+            }
+            log.error("Error: Invalid Data combinations !! ");
+            return true;
+        }
+        if( taskUpdateDTO.getBenContribution() != 0 && mTask.getBeneficiaryContributionRemain() - taskUpdateDTO.getBenContribution() >= 0){
+            mTask.setBeneficiaryContributionRemain(mTask.getBeneficiaryContributionRemain() - taskUpdateDTO.getBenContribution());
             mTaskRepository.save(mTask);
             return false;
         }
+        log.error("Error: Invalid Data combinations !! ");
         return true;
     }
 
-    public String updateTaskUpdate(long taskUpdateId, TaskUpdateDTO taskUpdateDTO) {
+    public String updateTaskUpdate(long taskUpdateId, TaskUpdateDTO taskUpdateDTO, MultipartFile passbookDoc, List<MultipartFile> otherDocs) {
         try {
             M_Task_Update m_task_update = mTaskUpdateRepository.findById(taskUpdateId).orElse(null);
             if (m_task_update != null) {
@@ -287,18 +314,21 @@ public class BeneficiaryService {
                 if (taskUpdateDTO.getPayeeName() != null && !taskUpdateDTO.getPayeeName().isEmpty()) {
                     m_task_update.setPayeeName(taskUpdateDTO.getPayeeName());
                 }
-                if (taskUpdateDTO.getAchievementUnit() != 0 && !checkInvalidDataLimit(taskUpdateDTO, mTask)) {
-                    m_task_update.setAchievementUnit(taskUpdateDTO.getAchievementUnit());
+                if (!checkInvalidDataLimit(taskUpdateDTO, mTask)) {
+                    if(taskUpdateDTO.getAchievementUnit() != 0 ){
+                        m_task_update.setAchievementUnit(taskUpdateDTO.getAchievementUnit());
+                    }
+                    if(taskUpdateDTO.getBenContribution() != 0 ){
+                        m_task_update.setCurrentBeneficiaryContribution(taskUpdateDTO.getBenContribution());
+                    }
+                    m_task_update.setCurrentCost(taskUpdateDTO.getCurrentCost());
                 }
-                if (taskUpdateDTO.getAchievementUnit() != 0 && checkInvalidDataLimit(taskUpdateDTO, mTask)) {
-                    return "FAILURE";
+                if (passbookDoc != null && !passbookDoc.isEmpty()) {
+                    Document passbook = documentStorageService.storeFile(passbookDoc);
+                    m_task_update.setPassbookDoc(passbook);
                 }
-                if (taskUpdateDTO.getPassbookDoc() != null && !taskUpdateDTO.getPassbookDoc().isEmpty()) {
-                    Document passbookDoc = documentStorageService.storeFile(taskUpdateDTO.getPassbookDoc());
-                    m_task_update.setPassbookDoc(passbookDoc);
-                }
-                if (taskUpdateDTO.getOtherDocs() != null && !taskUpdateDTO.getOtherDocs().isEmpty()) {
-                    List<Document> otherDocuments = taskUpdateDTO.getOtherDocs().stream()
+                if (otherDocs != null && !otherDocs.isEmpty()) {
+                    List<Document> otherDocuments = otherDocs.stream()
                             .map(file -> {
                                 try {
                                     return documentStorageService.storeFile(file);
@@ -312,6 +342,18 @@ public class BeneficiaryService {
                 return "SUCCESS";
             }
         } catch (Exception e) {
+            log.error("Exception occurred : {}", e.getMessage());
+        }
+        return "FAILURE";
+    }
+
+    public String uploadResolutionDocs(String userId, MultipartFile resolutionDoc, ResolutionTaskDTO resolutionTaskDTO) throws IOException {
+        try {
+            Document passbookDoc = documentStorageService.storeFile(resolutionDoc);
+            Project project = projectService.findByName(resolutionTaskDTO.getProjectName());
+            resolutionTaskService.uploadResolutionTask(userId, project, passbookDoc);
+            return "SUCCESS";
+        }catch (Exception e){
             log.error("Exception occurred : {}", e.getMessage());
         }
         return "FAILURE";

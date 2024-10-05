@@ -13,7 +13,5 @@ public class TaskUpdateDTO {
     private String payeeName;
     private Long currentCost;
     private String accountNumber;
-    private Long benContribution;
-    private MultipartFile passbookDoc;
-    private List<MultipartFile> otherDocs;
+    private int benContribution;
 }
