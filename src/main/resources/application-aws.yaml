@@ -4,9 +4,9 @@ spring:
 
   # DataSource Configuration
   datasource:
-    url: jdbc:postgresql://ekalavya-db.c106aq42gehb.ap-south-1.rds.amazonaws.com:5432/ekalavya_db
+    url: jdbc:postgresql://ekalavya-db.c106aq42gehb.ap-south-1.rds.amazonaws.com/ekalavya_db
     username: postgres
-    password: password
+    password: 52lIdDtRahFvADumWmze
     driver-class-name: org.postgresql.Driver
     initialization-mode: always
 
