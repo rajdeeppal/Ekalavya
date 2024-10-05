@@ -346,16 +346,4 @@ public class BeneficiaryService {
         }
         return "FAILURE";
     }
-
-    public String uploadResolutionDocs(String userId, MultipartFile resolutionDoc, ResolutionTaskDTO resolutionTaskDTO) throws IOException {
-        try {
-            Document passbookDoc = documentStorageService.storeFile(resolutionDoc);
-            Project project = projectService.findByName(resolutionTaskDTO.getProjectName());
-            resolutionTaskService.uploadResolutionTask(userId, project, passbookDoc);
-            return "SUCCESS";
-        }catch (Exception e){
-            log.error("Exception occurred : {}", e.getMessage());
-        }
-        return "FAILURE";
-    }
 }

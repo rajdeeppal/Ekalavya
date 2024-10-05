@@ -2,12 +2,12 @@ package com.ekalavya.org.controller;
 
 import com.ekalavya.org.DTO.*;
 import com.ekalavya.org.service.BeneficiaryService;
+import com.ekalavya.org.service.ResolutionTaskService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +22,9 @@ public class BeneficiaryController {
 
     @Autowired
     private BeneficiaryService beneficiaryService;
+
+    @Autowired
+    private ResolutionTaskService resolutionTaskService;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -87,11 +90,16 @@ public class BeneficiaryController {
     @PostMapping("/resolution/upload/{userId}")
     public ResponseEntity<String> uploadResolutionDocs(@PathVariable String userId,
                                                        @RequestParam("file") MultipartFile resolutionDoc,
-                                                       @RequestBody ResolutionTaskDTO resolutionTaskDTO) throws IOException {
-        if ("SUCCESS".equals(beneficiaryService.uploadResolutionDocs(userId, resolutionDoc, resolutionTaskDTO))){
+                                                       @RequestParam String projectName) throws IOException {
+        if ("SUCCESS".equals(resolutionTaskService.uploadResolutionDocs(userId, resolutionDoc, projectName))){
             return new ResponseEntity<>(HttpStatus.CREATED);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @GetMapping("/resolution/view")
+    public List<ResolutionTaskResponseDTO> getLatestResolutions(@RequestParam String projectName){
+        return resolutionTaskService.getLatest5ResolutionsByProjectName(projectName);
     }
 
 }

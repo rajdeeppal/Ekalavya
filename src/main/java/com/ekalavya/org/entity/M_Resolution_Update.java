@@ -1,10 +1,8 @@
 package com.ekalavya.org.entity;
 
-import com.ekalavya.org.service.ProjectService;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -13,12 +11,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
 public class M_Resolution_Update {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalDateTime timestamp = LocalDateTime.now();
+    private LocalDateTime uploadTimestamp;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
@@ -31,4 +28,8 @@ public class M_Resolution_Update {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "project_id")
     private Project project;
+
+    public M_Resolution_Update() {
+        this.uploadTimestamp = LocalDateTime.now();
+    }
 }
