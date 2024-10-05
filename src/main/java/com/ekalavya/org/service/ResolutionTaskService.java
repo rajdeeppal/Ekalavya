@@ -29,6 +29,7 @@ public class ResolutionTaskService {
             mResolutionUpdate.setResolutionDoc(passbookDoc);
             mResolutionUpdate.setProject(project);
             mResolutionUpdate.setUser(user);
+            mResolutionUpdateRepository.save(mResolutionUpdate);
         }
     }
 }
