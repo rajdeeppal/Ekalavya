@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface MActivityRepository extends JpaRepository<M_Activity, Long> {
 
     M_Activity findById(long id);
-    M_Activity findByNameAndComponent(String name, M_Component component);
+    M_Activity findByActivityNameAndComponent(String name, M_Component component);
 
     @Query("SELECT mActivity FROM M_Activity mActivity WHERE mActivity.isCompleted = 'N'")
     Page<M_Activity> findIncompleteActivities(Pageable pageable);

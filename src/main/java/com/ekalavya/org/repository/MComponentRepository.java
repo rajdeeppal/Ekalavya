@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MComponentRepository extends JpaRepository<M_Component, Long> {
-    M_Component findByNameAndBeneficiary(String name, M_Beneficiary m_beneficiary);
+    M_Component findByComponentNameAndBeneficiary(String name, M_Beneficiary m_beneficiary);
 
     @Query("SELECT mComponent FROM M_Component mComponent WHERE mComponent.isCompleted = 'N'")
     Page<M_Component> findIncompleteComponents(Pageable pageable);

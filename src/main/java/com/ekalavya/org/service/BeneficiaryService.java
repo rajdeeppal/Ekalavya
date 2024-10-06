@@ -171,7 +171,7 @@ public class BeneficiaryService {
         }
 
         /// create the component entity
-        M_Component mComponent = mComponentRepository.findByNameAndBeneficiary(bRequest.getComponentName(), beneficiary);
+        M_Component mComponent = mComponentRepository.findByComponentNameAndBeneficiary(bRequest.getComponentName(), beneficiary);
         if (mComponent == null) {
             mComponent = new M_Component();
             mComponent.setComponentName(bRequest.getComponentName());
@@ -180,7 +180,7 @@ public class BeneficiaryService {
         }
 
         // create the activity entity
-        M_Activity mActivity = mActivityRepository.findByNameAndComponent(bRequest.getActivityName(), mComponent);
+        M_Activity mActivity = mActivityRepository.findByActivityNameAndComponent(bRequest.getActivityName(), mComponent);
         if (mActivity == null) {
             mActivity = new M_Activity();
             mActivity.setActivityName(bRequest.getActivityName());
@@ -188,7 +188,7 @@ public class BeneficiaryService {
             mActivityRepository.save(mActivity);
         }
 
-        M_Task mTask = mTaskRepository.findByNameAndActivity(bRequest.getTaskName(), mActivity);
+        M_Task mTask = mTaskRepository.findByTaskNameAndActivity(bRequest.getTaskName(), mActivity);
         // create the task entity
         if (mTask == null) {
             mTask = new M_Task();
@@ -257,6 +257,7 @@ public class BeneficiaryService {
                     m_task_update.setPayeeName(taskUpdateDTO.getPayeeName());
                     m_task_update.setPassbookDoc(passbookDoc);
                     m_task_update.setOtherDocs(otherDocuments);
+                    m_task_update.setAccountNumber(taskUpdateDTO.getAccountNumber());
                     mTaskUpdateRepository.save(m_task_update);
                     return "SUCCESS";
                 } else
@@ -311,6 +312,9 @@ public class BeneficiaryService {
             M_Task_Update m_task_update = mTaskUpdateRepository.findById(taskUpdateId).orElse(null);
             if (m_task_update != null) {
                 M_Task mTask = m_task_update.getTask();
+                if(taskUpdateDTO.getAccountNumber() != null ){
+                    m_task_update.setAccountNumber(taskUpdateDTO.getAccountNumber());
+                }
                 if (taskUpdateDTO.getPayeeName() != null && !taskUpdateDTO.getPayeeName().isEmpty()) {
                     m_task_update.setPayeeName(taskUpdateDTO.getPayeeName());
                 }
