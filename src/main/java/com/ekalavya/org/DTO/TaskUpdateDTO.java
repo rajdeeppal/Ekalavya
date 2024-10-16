@@ -14,4 +14,5 @@ public class TaskUpdateDTO {
     private Long currentCost;
     private String accountNumber;
     private int benContribution;
+    private String domainExpertEmpId;
 }

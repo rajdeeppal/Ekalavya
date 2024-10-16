@@ -43,7 +43,8 @@ public class AkalavyaApplication {
 			user.setUsername("debjit1");
 			user.setPassword(new BCryptPasswordEncoder().encode("password")); // Encrypt the password
 			user.setEmailid("debjit16.dc@gmail.com");
-			user.setDomain("domain1");
+			user.setVertical("Ver1");
+			user.setComponent("comp1");
 			user.setRole(userRole);
 			user.setEmpId(1898635L);
 			userRepository.save(user);
@@ -52,7 +53,8 @@ public class AkalavyaApplication {
 			adminUser.setUsername("debjit2");
 			adminUser.setPassword(new BCryptPasswordEncoder().encode("password")); // Encrypt the password
 			adminUser.setEmailid("debjit16.dc@gmail.com");
-			adminUser.setDomain("domain1");
+			user.setVertical("");
+			user.setComponent("");
 			adminUser.setRole(adminRole);
 			adminUser.setEmpId(1898636L);
 			userRepository.save(adminUser);

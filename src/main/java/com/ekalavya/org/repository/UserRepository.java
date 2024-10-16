@@ -28,4 +28,7 @@ public interface UserRepository extends JpaRepository<User, Long>{
 
 	@Query("SELECT MAX(u.empId) FROM User u")
 	Long findMaxEmpId();
+
+	@Query("SELECT u FROM User u WHERE u.component = :componentName AND u.vertical = :verticalName")
+    List<User> findDomainExpertByComponentAndVertical(String componentName, String verticalName);
 }

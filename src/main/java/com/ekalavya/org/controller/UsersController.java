@@ -1,8 +1,12 @@
 package com.ekalavya.org.controller;
 
 import com.ekalavya.org.DTO.ProjectDTO;
+import com.ekalavya.org.DTO.TaskUpdateDTO;
 import com.ekalavya.org.entity.Component;
 import com.ekalavya.org.entity.Project;
+import com.ekalavya.org.entity.User;
+import com.ekalavya.org.entity.Vertical;
+import com.ekalavya.org.service.BeneficiaryService;
 import com.ekalavya.org.service.ComponentService;
 import com.ekalavya.org.service.ProjectService;
 import com.ekalavya.org.service.UserService;
@@ -13,7 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -31,6 +37,9 @@ public class UsersController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private BeneficiaryService beneficiaryService;
+
 
     @GetMapping("/pm/dashboard")
     public String showUserHomePage() {
@@ -38,11 +47,11 @@ public class UsersController {
     }
 
     @PostMapping("/pm/project/save/{userId}")
-    public ResponseEntity<?> addProject(@PathVariable String userId, @RequestBody ProjectDTO projectDTO){
+    public ResponseEntity<?> addProject(@PathVariable String userId, @RequestBody ProjectDTO projectDTO) {
         try {
             Project project = projectService.addProject(userId, projectDTO);
             return ResponseEntity.ok(project);
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("Error creating project", e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -71,6 +80,21 @@ public class UsersController {
         } catch (Exception e) {
             logger.error("Error fetching components", e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error fetching components");
+        }
+    }
+
+    @GetMapping("/search/domain-expert/{taskId}")
+    public ResponseEntity<?> domainExpertSearch(@PathVariable("taskId") long taskId) throws IOException {
+        try {
+            List<String> info = beneficiaryService.determineUnderlyingVerticalAndComponent(taskId);
+            List<User> domainExpertList = userService.getSkilledDomainExpert(info.get(0), info.get(1));
+            if (domainExpertList.isEmpty()) {
+                return ResponseEntity.badRequest().body("No skilled Domain Expert Found !!");
+            }
+            return ResponseEntity.ok(domainExpertList);
+        } catch (Exception e) {
+            logger.error("Error fetching components", e);
+            return ResponseEntity.status(500).body("Error fetching components");
         }
     }
 }

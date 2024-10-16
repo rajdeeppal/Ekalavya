@@ -18,7 +18,7 @@ import java.util.List;
 @Slf4j
 public class RoleRequestService {
 
-	@Autowired
+    @Autowired
     private RoleRequestRepository roleRequestRepository;
 
     @Autowired
@@ -48,7 +48,7 @@ public class RoleRequestService {
         return roleRequestRepository.save(request);
     }
 
-    public void deleteRoleRequestById(Long roleRequestId){
+    public void deleteRoleRequestById(Long roleRequestId) {
         roleRequestRepository.deleteById(roleRequestId);
     }
 
@@ -62,13 +62,16 @@ public class RoleRequestService {
 
     @Transactional
     public boolean createNewUserAndCreateARoleRequest(UserCreateRequest userCreateRequest) throws CustomException {
-        try{
+        try {
             User user = new User();
             if ("Domain Expert".equals(userCreateRequest.getRequestedRole())) {
-                if (userCreateRequest.getDomain() == null || userCreateRequest.getDomain().isEmpty()) {
+                if (userCreateRequest.getVertical() == null || userCreateRequest.getVertical().isEmpty() ||
+                        userCreateRequest.getComponent() == null || userCreateRequest.getComponent().isEmpty()) {
                     throw new CustomException("Domain is required for DOMAIN EXPERT role.");
-                } else
-                    user.setDomain(userCreateRequest.getDomain());
+                } else {
+                    user.setVertical(userCreateRequest.getVertical());
+                    user.setComponent(userCreateRequest.getComponent());
+                }
             }
             Role role = roleService.getRoleByRolename(userCreateRequest.getRequestedRole());
             if (role != null) {
@@ -88,7 +91,7 @@ public class RoleRequestService {
                 return true;
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Exception occurred at : {}", e.getMessage());
             return false;
         }

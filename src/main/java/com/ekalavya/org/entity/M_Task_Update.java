@@ -32,6 +32,7 @@ public class M_Task_Update {
     private boolean isRejectionOccurred;
     private String transactionId;
     private String accountNumber;
+    private Long domainExpertEmpId;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "passbook_doc_id", referencedColumnName = "id")
     private Document passbookDoc;

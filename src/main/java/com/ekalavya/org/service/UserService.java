@@ -1,5 +1,6 @@
 package com.ekalavya.org.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.ekalavya.org.repository.RoleRequestRepository;
@@ -78,5 +79,9 @@ public class UserService {
 		}
 		else
 			logger.warn("User not exist in our Database", user.get().getUsername());
+	}
+
+	public List<User> getSkilledDomainExpert(String componentName, String verticalName) {
+		return userRepository.findDomainExpertByComponentAndVertical(componentName, verticalName);
 	}
 }

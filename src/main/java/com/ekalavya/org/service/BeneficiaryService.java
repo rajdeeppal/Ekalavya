@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -127,6 +128,13 @@ public class BeneficiaryService {
         return objectMapper.convertValue(customBeneficiaryRepository.findBeneficiariesBasedOnCriteria(params), objectMapper.getTypeFactory().constructCollectionType(List.class, BeneficiaryResponse.class));
     }
 
+    public List<M_Beneficiary> getFilteredBeneficiariesWithPagination(String projectName, String componentName, String stateName, String districtName, int page, int size) {
+        return customBeneficiaryRepository.findBeneficiariesWithCriteria(projectName, componentName, stateName, districtName, page, size);
+    }
+
+    public long countFilteredBeneficiaries(String projectName, String componentName, String stateName, String districtName) {
+        return customBeneficiaryRepository.countBeneficiariesWithCriteria(projectName, componentName, stateName, districtName);
+    }
 
     public String addTask(long activityId, TaskCreationRequest taskCreationRequest) {
         try {
@@ -258,6 +266,7 @@ public class BeneficiaryService {
                     m_task_update.setPassbookDoc(passbookDoc);
                     m_task_update.setOtherDocs(otherDocuments);
                     m_task_update.setAccountNumber(taskUpdateDTO.getAccountNumber());
+                    m_task_update.setDomainExpertEmpId(Long.parseLong(taskUpdateDTO.getDomainExpertEmpId()));
                     mTaskUpdateRepository.save(m_task_update);
                     return "SUCCESS";
                 } else
@@ -318,6 +327,9 @@ public class BeneficiaryService {
                 if (taskUpdateDTO.getPayeeName() != null && !taskUpdateDTO.getPayeeName().isEmpty()) {
                     m_task_update.setPayeeName(taskUpdateDTO.getPayeeName());
                 }
+                if (taskUpdateDTO.getDomainExpertEmpId() != null && !taskUpdateDTO.getDomainExpertEmpId().isEmpty()) {
+                    m_task_update.setDomainExpertEmpId(Long.parseLong(taskUpdateDTO.getDomainExpertEmpId()));
+                }
                 if (!checkInvalidDataLimit(taskUpdateDTO, mTask)) {
                     if(taskUpdateDTO.getAchievementUnit() != 0 ){
                         m_task_update.setAchievementUnit(taskUpdateDTO.getAchievementUnit());
@@ -349,5 +361,10 @@ public class BeneficiaryService {
             log.error("Exception occurred : {}", e.getMessage());
         }
         return "FAILURE";
+    }
+
+    public List<String> determineUnderlyingVerticalAndComponent(long taskId) {
+        return Arrays.asList(mTaskRepository.findById(taskId).getActivity().getComponent().getComponentName(),
+                (mTaskRepository.findById(taskId).getActivity().getComponent().getBeneficiary().getProject().getVertical().getVerticalName()));
     }
 }

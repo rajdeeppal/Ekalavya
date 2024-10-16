@@ -16,7 +16,8 @@ public class User {
 	private String username;
 	private String password;
 	private String emailid;
-	private String domain;
+	private String vertical;
+	private String component;
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinTable(
 			name = "user_roles",
