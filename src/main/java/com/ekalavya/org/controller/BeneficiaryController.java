@@ -4,9 +4,14 @@ import com.ekalavya.org.DTO.*;
 import com.ekalavya.org.entity.M_Beneficiary;
 import com.ekalavya.org.service.BeneficiaryService;
 import com.ekalavya.org.service.ResolutionTaskService;
+import com.ekalavya.org.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +35,9 @@ public class BeneficiaryController {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @Autowired
+    private UserService userService;
 
     // TODO: add the update logic
     @PostMapping("/create")
@@ -67,30 +75,26 @@ public class BeneficiaryController {
         return beneficiaryService.getBeneficiaryByProjectName(params);
     }
 
-    @GetMapping("/filter")
-    public ResponseEntity<Map<String, Object>> filterBeneficiaries(
-            @RequestParam String projectName,
+    @GetMapping("/filter/{employeeId}")
+    public Page<M_Beneficiary> filterBeneficiaries(
+            @PathVariable("employeeId") Long employeeId,
+            @RequestParam(required = true) String projectName,
             @RequestParam(required = false) String componentName,
             @RequestParam(required = false) String stateName,
             @RequestParam(required = false) String districtName,
+            @RequestParam(required = true) String stage, // "sanction", "inprogress", "preview", "rejection"
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
+            @RequestParam(defaultValue = "10") int size) {
+
         // Fetch filtered beneficiaries with pagination
-        List<M_Beneficiary> beneficiaries = beneficiaryService.getFilteredBeneficiariesWithPagination(projectName, componentName, stateName, districtName, page, size);
+        String userRolename = userService.findByEmplId(String.valueOf(employeeId)).getRole().getName();
 
-        // Count the total number of matching beneficiaries
-        long totalBeneficiaries = beneficiaryService.countFilteredBeneficiaries(projectName, componentName, stateName, districtName);
+        List<M_Beneficiary> beneficiaries = beneficiaryService.
+                findBeneficiariesWithStageCriteria(projectName, componentName, stateName, districtName, employeeId, userRolename, stage, page, size);
+        long totalBeneficiaries = beneficiaryService.countFilteredBeneficiaries(projectName, componentName, stateName, districtName, employeeId, userRolename, stage);
 
-        // Prepare response with pagination metadata
-        Map<String, Object> response = new HashMap<>();
-        response.put("beneficiaries", beneficiaries);
-        response.put("currentPage", page);
-        response.put("pageSize", size);
-        response.put("totalRecords", totalBeneficiaries);
-        response.put("totalPages", (totalBeneficiaries + size - 1) / size); // Calculate total pages
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        Pageable pageable = PageRequest.of(page, size);
+        return new PageImpl<>(beneficiaries, pageable, totalBeneficiaries);
     }
 
     @PostMapping("/addTaskUpdate/{taskId}")

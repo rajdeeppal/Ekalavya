@@ -62,9 +62,9 @@ public class UserService {
 	}
 
 	public User findByEmplId(String id) {
-		Optional<User> user = userRepository.findByEmployeeId(Long.parseLong(id));
-		if(user.isPresent()) {
-			return user.get();
+		User user = userRepository.findByEmployeeId(Long.parseLong(id)).orElseThrow(() -> new RuntimeException("Employee not found"));
+		if(user != null ) {
+			return user;
 		}
 		logger.info("Not a active user !! ");
 		return new User();

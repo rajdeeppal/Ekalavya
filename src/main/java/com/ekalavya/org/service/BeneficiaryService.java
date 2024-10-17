@@ -128,12 +128,13 @@ public class BeneficiaryService {
         return objectMapper.convertValue(customBeneficiaryRepository.findBeneficiariesBasedOnCriteria(params), objectMapper.getTypeFactory().constructCollectionType(List.class, BeneficiaryResponse.class));
     }
 
-    public List<M_Beneficiary> getFilteredBeneficiariesWithPagination(String projectName, String componentName, String stateName, String districtName, int page, int size) {
-        return customBeneficiaryRepository.findBeneficiariesWithCriteria(projectName, componentName, stateName, districtName, page, size);
+    public List<M_Beneficiary> findBeneficiariesWithStageCriteria(String projectName, String componentName, String stateName, String districtName, Long employeeId, String userRolename, String stage, int page, int size) {
+
+        return customBeneficiaryRepository.findBeneficiariesWithStageCriteria(projectName, componentName, stateName, districtName, employeeId, stage, userRolename, page, size);
     }
 
-    public long countFilteredBeneficiaries(String projectName, String componentName, String stateName, String districtName) {
-        return customBeneficiaryRepository.countBeneficiariesWithCriteria(projectName, componentName, stateName, districtName);
+    public long countFilteredBeneficiaries(String projectName, String componentName, String stateName, String districtName, Long employeeId, String userRolename, String stage) {
+        return customBeneficiaryRepository.countBeneficiariesWithCriteria(projectName, componentName, stateName, districtName, employeeId, userRolename, stage);
     }
 
     public String addTask(long activityId, TaskCreationRequest taskCreationRequest) {
