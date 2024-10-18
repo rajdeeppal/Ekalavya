@@ -48,7 +48,7 @@ public class BeneficiaryController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping("/addTask/{activityId}")
+    @PostMapping("/addTask/{activityId}")                   //not require as this functionality is covered by /create api
     public ResponseEntity<String> addTaskUnderActivityById(@PathVariable("activityId") long activity, @RequestBody TaskCreationRequest taskCreationRequest) {
         if ("SUCCESS".equals(beneficiaryService.addTask(activity, taskCreationRequest))) {
             return new ResponseEntity<>(HttpStatus.CREATED);

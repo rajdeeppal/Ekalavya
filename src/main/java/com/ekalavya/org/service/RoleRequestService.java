@@ -64,7 +64,7 @@ public class RoleRequestService {
     public boolean createNewUserAndCreateARoleRequest(UserCreateRequest userCreateRequest) throws CustomException {
         try {
             User user = new User();
-            if ("Domain Expert".equals(userCreateRequest.getRequestedRole())) {
+            if ("Domain Expert".equalsIgnoreCase(userCreateRequest.getRequestedRole())) {
                 if (userCreateRequest.getVertical() == null || userCreateRequest.getVertical().isEmpty() ||
                         userCreateRequest.getComponent() == null || userCreateRequest.getComponent().isEmpty()) {
                     throw new CustomException("Domain is required for DOMAIN EXPERT role.");
