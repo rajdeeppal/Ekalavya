@@ -113,11 +113,11 @@ public class BeneficiaryService {
 //        return beneficiaryEntity;
 //    }
 
-    public List<BeneficiaryResponse> getAllBeneficiaries() {
-        List<M_Beneficiary> beneficiaries = beneficiaryRepository.findAll();
-        return beneficiaries.stream()
+    public List<M_Beneficiary> getAllBeneficiaries() {
+        return beneficiaryRepository.findAll();
+/*        return beneficiaries.stream()
                 .map(mBeneficiary -> objectMapper.convertValue(mBeneficiary, BeneficiaryResponse.class))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList());*/
     }
 
 
@@ -128,14 +128,14 @@ public class BeneficiaryService {
         return objectMapper.convertValue(customBeneficiaryRepository.findBeneficiariesBasedOnCriteria(params), objectMapper.getTypeFactory().constructCollectionType(List.class, BeneficiaryResponse.class));
     }
 
-    public List<M_Beneficiary> findBeneficiariesWithStageCriteria(String projectName, String componentName, String stateName, String districtName, Long employeeId, String userRolename, String stage, int page, int size) {
+    public Map<String, Object> findBeneficiariesWithStageCriteria(String projectName, String componentName, String stateName, String districtName, Long employeeId, String userRolename, String stage, int page, int size) {
 
-        return customBeneficiaryRepository.findBeneficiariesWithStageCriteria(projectName, componentName, stateName, districtName, employeeId, stage, userRolename, page, size);
+        return customBeneficiaryRepository.findTaskUpdates(userRolename, stage, employeeId, projectName, componentName, stateName, districtName);
     }
 
-    public long countFilteredBeneficiaries(String projectName, String componentName, String stateName, String districtName, Long employeeId, String userRolename, String stage) {
+/*    public long countFilteredBeneficiaries(String projectName, String componentName, String stateName, String districtName, Long employeeId, String userRolename, String stage) {
         return customBeneficiaryRepository.countBeneficiariesWithCriteria(projectName, componentName, stateName, districtName, employeeId, userRolename, stage);
-    }
+    }*/
 
     public String addTask(long activityId, TaskCreationRequest taskCreationRequest) {
         try {
@@ -213,6 +213,7 @@ public class BeneficiaryService {
             mTask.setGrantAmount(bRequest.getGrantAmount());
             mTask.setYearOfSanction(bRequest.getYearOfSanction());
             mTask.setActivity(mActivity);
+            mTask.setSanction(false);
             mTaskRepository.save(mTask);
         }
 

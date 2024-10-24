@@ -3,7 +3,9 @@ package com.ekalavya.org.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -35,6 +37,7 @@ public class M_Task {
     private Long balanceRemaining;
     private int beneficiaryContributionRemain;
     private String isCompleted;
+    private boolean isSanction;     // default value = false, after bulk submit from sanction section mark to true
 
 /*    while viewing task (update/ edit/add) task update populate unitRemain, balanceRemaining, beneficiaryContributionRemain, grandTotalRemaining
     instead of units, total cost, beneficiaryContribution, grantAmount as this will be the updated valuse*/

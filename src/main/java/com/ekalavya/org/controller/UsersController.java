@@ -1,11 +1,10 @@
 package com.ekalavya.org.controller;
 
 import com.ekalavya.org.DTO.ProjectDTO;
-import com.ekalavya.org.DTO.TaskUpdateDTO;
+import com.ekalavya.org.DTO.ProjectViewDTO;
 import com.ekalavya.org.entity.Component;
 import com.ekalavya.org.entity.Project;
 import com.ekalavya.org.entity.User;
-import com.ekalavya.org.entity.Vertical;
 import com.ekalavya.org.service.BeneficiaryService;
 import com.ekalavya.org.service.ComponentService;
 import com.ekalavya.org.service.ProjectService;
@@ -15,12 +14,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/user")
@@ -61,7 +59,9 @@ public class UsersController {
     public ResponseEntity<?> getProjects(@PathVariable String userId) {
         try {
             List<Project> projects = projectService.getInprogressProjectsByUserId(userId);
-            return ResponseEntity.ok(projects);
+            return ResponseEntity.ok(projects.stream()
+                    .map(project -> new ProjectViewDTO(project.getId(), project.getProjectName()))
+                    .collect(Collectors.toList()));
         } catch (Exception e) {
             logger.error("Error fetching projects", e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error fetching projects");
