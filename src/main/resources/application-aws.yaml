@@ -6,7 +6,7 @@ spring:
   datasource:
     url: jdbc:postgresql://ekalavya-db.c106aq42gehb.ap-south-1.rds.amazonaws.com/ekalavya_db
     username: postgres
-    password: 52lIdDtRahFvADumWmze
+    password: ekalavya_MasterPassword#2024
     driver-class-name: org.postgresql.Driver
     initialization-mode: always
 
