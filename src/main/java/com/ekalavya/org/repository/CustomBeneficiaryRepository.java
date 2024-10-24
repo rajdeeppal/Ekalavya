@@ -9,12 +9,10 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 public class CustomBeneficiaryRepository {
@@ -24,6 +22,9 @@ public class CustomBeneficiaryRepository {
 
     @Autowired
     private BeneficiaryRepository beneficiaryRepository;
+
+    @Value("${base.url}")
+    private String baseUrl;
 
 
     public List<M_Beneficiary> findBeneficiariesBasedOnCriteria(Map<String, String> params) {
@@ -43,17 +44,16 @@ public class CustomBeneficiaryRepository {
     }
     public Map<String, Object> findTaskUpdates(String employeeRole, String stage, Long employeeId, String projectName, String componentName, String stateName, String districtName) {
         StringBuilder sql = new StringBuilder(
-                "SELECT b.id AS beneficiary_id, b.beneficiary_name, b.guardian_name, b.state_name, b.village_name, " +
-                        "b.mandal_name, b.district_name, b.aadhar_number, c.id AS component_id, c.component_name, " +
+                "SELECT p.id AS project_id, b.id AS beneficiary_id, b.beneficiary_name, b.guardian_name, b.state_name, " +
+                        "b.village_name, b.mandal_name, b.district_name, b.aadhar_number, c.id AS component_id, c.component_name, " +
                         "a.id AS activity_id, a.activity_name, t.id AS task_id, t.task_name, t.type_of_unit, t.units, t.rate_per_unit, " +
                         "t.total_cost, t.beneficiary_contribution, t.grant_amount, t.year_of_sanction, t.unit_remain, t.balance_remaining, " +
                         "t.beneficiary_contribution_remain, t.is_completed AS task_is_completed, t.is_sanction AS task_sanction, " +
                         "tu.id AS task_update_id, tu.created_date, tu.pending_with, tu.payee_name, tu.achievement_unit, tu.is_completed, " +
-                        "tu.is_rejection_occurred, tu.account_number, tu.remarks, " +
-                        "pd.id AS passbook_doc_id, pd.file_name AS passbook_file_name, " +
+                        "tu.is_rejection_occurred, tu.account_number, tu.remarks, pd.id AS passbook_doc_id, pd.file_name AS passbook_file_name, " +
                         "od.id AS other_doc_id, od.file_name AS other_doc_file_name " +
-                        "FROM m_beneficiary b " +
-                        "JOIN project p ON b.project_id = p.id " +
+                        "FROM project p " +
+                        "JOIN m_beneficiary b ON b.project_id = p.id " +
                         "JOIN m_component c ON c.beneficiary_id = b.id " +
                         "JOIN m_activity a ON a.component_id = c.id " +
                         "JOIN m_task t ON t.activity_id = a.id " +
@@ -63,15 +63,19 @@ public class CustomBeneficiaryRepository {
                         "WHERE p.project_name = :projectName "
         );
 
-        if(componentName != null && !componentName.isEmpty()){
-            sql.append("AND c.component_name = '" + componentName + "' ");
-        }
-        if(stateName != null && !stateName.isEmpty() ){
-            sql.append("AND b.state_name = '"+stateName+"' ");
-        }
-        if(districtName != null && !districtName.isEmpty() ){
-            sql.append("AND b.district_name = '"+districtName+"' ");
-        }
+        // Use Optional to handle null values
+        Optional.ofNullable(componentName)
+                .filter(name -> !name.isEmpty())
+                .ifPresent(name -> sql.append("AND c.component_name = :componentName "));
+
+        Optional.ofNullable(stateName)
+                .filter(name -> !name.isEmpty())
+                .ifPresent(name -> sql.append("AND b.state_name = :stateName "));
+
+        Optional.ofNullable(districtName)
+                .filter(name -> !name.isEmpty())
+                .ifPresent(name -> sql.append("AND b.district_name = :districtName "));
+
         // Add dynamic conditions based on employeeRole and stage
         if ("PM".equals(employeeRole)) {
             switch (stage) {
@@ -96,25 +100,30 @@ public class CustomBeneficiaryRepository {
             throw new RuntimeException("Unsupported role: " + employeeRole);
         }
 
-        // Create native query
         Query query = entityManager.createNativeQuery(sql.toString());
 
-        // Set parameters
         query.setParameter("projectName", projectName);
-//        query.setParameter("componentName", componentName);
-//        query.setParameter("stateName", stateName);
-//        query.setParameter("districtName", districtName);
+
+        Optional.ofNullable(componentName).ifPresent(name -> query.setParameter("componentName", name));
+        Optional.ofNullable(stateName).ifPresent(name -> query.setParameter("stateName", name));
+        Optional.ofNullable(districtName).ifPresent(name -> query.setParameter("districtName", name));
+
         if ("DE".equals(employeeRole)) {
             query.setParameter("employeeId", employeeId);
         }
 
-        // Fetch all results without pagination
         List<Object[]> results = query.getResultList();
 
         // Build the nested structure: Project → Beneficiaries → Components → Activities → Tasks → Task Updates
         Map<String, Object> projectData = new HashMap<>();
-        projectData.put("id", 1); // You can set this dynamically based on the project data.
-        projectData.put("projectName", projectName);
+        if (!results.isEmpty()) {
+            Object[] firstRow = results.get(0);
+            Long projectId = (Long) firstRow[0];  // Assuming project_id is at index 0
+
+            // Dynamically set the project ID and project name
+            projectData.put("id", projectId);
+            projectData.put("projectName", projectName);
+        }
 
         List<Map<String, Object>> beneficiaries = new ArrayList<>();
 
@@ -124,89 +133,89 @@ public class CustomBeneficiaryRepository {
         Map<Long, Map<String, Object>> taskMap = new HashMap<>();
 
         for (Object[] row : results) {
-            Long beneficiaryId = (Long) row[0];
+            Long beneficiaryId = (Long) row[1];
             Map<String, Object> beneficiary = beneficiaryMap.computeIfAbsent(beneficiaryId, id -> {
                 Map<String, Object> b = new HashMap<>();
                 b.put("id", id);
-                b.put("beneficiaryName", row[1]);
-                b.put("guardianName", row[2]);
-                b.put("stateName", row[3]);
-                b.put("villageName", row[4]);
-                b.put("mandalName", row[5]);
-                b.put("districtName", row[6]);
-                b.put("aadharNumber", row[7]);
+                b.put("beneficiaryName", row[2]);
+                b.put("guardianName", row[3]);
+                b.put("stateName", row[4]);
+                b.put("villageName", row[5]);
+                b.put("mandalName", row[6]);
+                b.put("districtName", row[7]);
+                b.put("aadharNumber", row[8]);
                 b.put("components", new ArrayList<>());
                 return b;
             });
 
-            Long componentId = (Long) row[8];
+            Long componentId = (Long) row[9];
             Map<String, Object> component = componentMap.computeIfAbsent(componentId, id -> {
                 Map<String, Object> c = new HashMap<>();
                 c.put("id", id);
-                c.put("componentName", row[9]);
+                c.put("componentName", row[10]);
                 c.put("activities", new ArrayList<>());
                 return c;
             });
 
-            Long activityId = (Long) row[10];
+            Long activityId = (Long) row[11];
             Map<String, Object> activity = activityMap.computeIfAbsent(activityId, id -> {
                 Map<String, Object> a = new HashMap<>();
                 a.put("id", id);
-                a.put("activityName", row[11]);
+                a.put("activityName", row[12]);
                 a.put("tasks", new ArrayList<>());
                 return a;
             });
 
-            Long taskId = (Long) row[12];
+            Long taskId = (Long) row[13];
             Map<String, Object> task = taskMap.computeIfAbsent(taskId, id -> {
                 Map<String, Object> t = new HashMap<>();
                 t.put("id", id);
-                t.put("taskName", row[13]);
-                t.put("typeOfUnit", row[14]);
-                t.put("units", row[15]);
-                t.put("ratePerUnit", row[16]);
-                t.put("totalCost", row[17]);
-                t.put("beneficiaryContribution", row[18]);
-                t.put("grantAmount", row[19]);
-                t.put("yearOfSanction", row[20]);
-                t.put("unitRemain", row[21]);
-                t.put("balanceRemaining", row[22]);
-                t.put("beneficiaryContributionRemain", row[23]);
-                t.put("isCompleted", row[24]);
-                t.put("isSanction", row[25]);
+                t.put("taskName", row[14]);
+                t.put("typeOfUnit", row[15]);
+                t.put("units", row[16]);
+                t.put("ratePerUnit", row[17]);
+                t.put("totalCost", row[18]);
+                t.put("beneficiaryContribution", row[19]);
+                t.put("grantAmount", row[20]);
+                t.put("yearOfSanction", row[21]);
+                t.put("unitRemain", row[22]);
+                t.put("balanceRemaining", row[23]);
+                t.put("beneficiaryContributionRemain", row[24]);
+                t.put("isCompleted", row[25]);
+                t.put("isSanction", row[26]);
                 t.put("taskUpdates", new ArrayList<>()); // Initialize taskUpdates list
                 return t;
             });
 
             // Add Task Update
-            if (row[26] != null) {
+            if (row[27] != null) {
                 Map<String, Object> taskUpdate = new HashMap<>();
-                taskUpdate.put("id", row[26]);
-                taskUpdate.put("createdDate", row[27]);
-                taskUpdate.put("pendingWith", row[28]);
-                taskUpdate.put("payeeName", row[29]);
-                taskUpdate.put("achievementUnit", row[30]);
-                taskUpdate.put("isCompleted", row[31]);
-                taskUpdate.put("isRejectionOccurred", row[32]);
-                taskUpdate.put("accountNumber", row[33]);
-                taskUpdate.put("remarks", row[34]);
+                taskUpdate.put("id", row[27]);
+                taskUpdate.put("createdDate", row[28]);
+                taskUpdate.put("pendingWith", row[29]);
+                taskUpdate.put("payeeName", row[30]);
+                taskUpdate.put("achievementUnit", row[31]);
+                taskUpdate.put("isCompleted", row[32]);
+                taskUpdate.put("isRejectionOccurred", row[33]);
+                taskUpdate.put("accountNumber", row[34]);
+                taskUpdate.put("remarks", row[35]);
 
                 // Add passbookDoc file details
-                if (row[35] != null) {
+                if (row[36] != null) {
                     Map<String, Object> passbookDoc = new HashMap<>();
-                    passbookDoc.put("id", row[35]);
-                    passbookDoc.put("fileName", row[36]);
-                    passbookDoc.put("downloadUrl", "/download/" + row[35]);  // URL to download file
+                    passbookDoc.put("id", row[36]);
+                    passbookDoc.put("fileName", row[37]);
+                    passbookDoc.put("downloadUrl", baseUrl + "/download-document/" + row[36]);  // URL to download file
                     taskUpdate.put("passbookDoc", passbookDoc);
                 }
 
                 // Add otherDocs details
                 List<Map<String, Object>> otherDocuments = new ArrayList<>();
-                if (row[37] != null) {
+                if (row[38] != null) {
                     Map<String, Object> otherDoc = new HashMap<>();
-                    otherDoc.put("id", row[37]);
-                    otherDoc.put("fileName", row[38]);
-                    otherDoc.put("downloadUrl", "/download/" + row[37]);  // URL to download each file
+                    otherDoc.put("id", row[38]);
+                    otherDoc.put("fileName", row[39]);
+                    otherDoc.put("downloadUrl", baseUrl + "/download-document/" + row[38]);  // URL to download each file
                     otherDocuments.add(otherDoc);
                 }
                 taskUpdate.put("otherDocs", otherDocuments);

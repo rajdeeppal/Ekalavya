@@ -54,3 +54,5 @@ server:
 logging:
   level:
     com.ekalavya.org: INFO
+base:
+  url: http://3.111.84.98:61002

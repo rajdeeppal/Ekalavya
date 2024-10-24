@@ -54,3 +54,5 @@ server:
 logging:
   level:
     com.ekalavya.org: INFO
+base:
+  url: http://localhost:61002
