@@ -23,4 +23,6 @@ public interface BeneficiaryRepository extends JpaRepository<M_Beneficiary, Long
 
     @Query("SELECT a FROM M_Beneficiary a WHERE a.terminate = 'N'")
     Page<M_Beneficiary> findIncompleteBeneficiaries(Pageable pageable);
+
+    List<M_Beneficiary> findByAadharNumber(long aadharNumber);
 }

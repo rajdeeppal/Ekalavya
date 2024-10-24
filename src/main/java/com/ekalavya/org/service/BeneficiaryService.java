@@ -369,4 +369,8 @@ public class BeneficiaryService {
         return Arrays.asList(mTaskRepository.findById(taskId).getActivity().getComponent().getComponentName(),
                 (mTaskRepository.findById(taskId).getActivity().getComponent().getBeneficiary().getProject().getVertical().getVerticalName()));
     }
+
+    public List<M_Beneficiary> findByAadharCard(long aadharNumber) {
+        return beneficiaryRepository.findByAadharNumber(aadharNumber);
+    }
 }

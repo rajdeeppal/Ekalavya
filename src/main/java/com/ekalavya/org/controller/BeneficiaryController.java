@@ -1,7 +1,9 @@
 package com.ekalavya.org.controller;
 
 import com.ekalavya.org.DTO.*;
+import com.ekalavya.org.entity.M_Beneficiary;
 import com.ekalavya.org.entity.Project;
+import com.ekalavya.org.entity.User;
 import com.ekalavya.org.service.BeneficiaryService;
 import com.ekalavya.org.service.ProjectService;
 import com.ekalavya.org.service.ResolutionTaskService;
@@ -17,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/beneficiary")
@@ -131,6 +134,19 @@ public class BeneficiaryController {
     @GetMapping("/resolution/view")
     public List<ResolutionTaskResponseDTO> getLatestResolutions(@RequestParam String projectName){
         return resolutionTaskService.getLatest5ResolutionsByProjectName(projectName);
+    }
+
+    @GetMapping("/search/beneficiary-aadhar/{aadharNumber}")
+    public ResponseEntity<?> aadharSearch(@PathVariable String aadharNumber) throws IOException {
+        try {
+            List<M_Beneficiary> mBeneficiaries = beneficiaryService.findByAadharCard(Long.parseLong(aadharNumber));
+            return ResponseEntity.ok(mBeneficiaries.stream()
+                    .map(beneficiary -> new BeneficiaryPersonalInfoDTO(beneficiary.getBeneficiaryName(), beneficiary.getGuardianName(), beneficiary.getStateName(),
+                            beneficiary.getVillageName(), beneficiary.getMandalName(), beneficiary.getDistrictName(), beneficiary.getAadharNumber()))
+                    .collect(Collectors.toList()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error fetching Beneficiary details");
+        }
     }
 
 }
